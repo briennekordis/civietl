@@ -1,6 +1,10 @@
 {
     "require": {
         "egulias/email-validator": "^4.0",
-        "league/csv": "^9.0"
+        "league/csv": "^9.0",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {"Civietl\\": "src/"}
     }
 }
