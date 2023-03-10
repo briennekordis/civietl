@@ -1,27 +1,27 @@
 <?php
-namespace Civietl\Cache;
+namespace Civietl\Reader;
 
-class CacheService {
-  private $cacheService;
+class ReaderService {
+  private $reader;
 
-  public function __construct(CacheService $cacheService) {
-    $this->cacheService = $cacheService;
+  public function __construct(ReaderInterface $reader) {
+    $this->reader = $reader;
   }
 
-  public function addRow(array $row) : string {
-    return $this->cacheService->addRow($row);
+  public function getRow($columnName, $value) : array {
+    return $this->reader->getRow($columnName, $value);
   }
 
-  public function clearCache() : void {
-    $this->cacheService->clearCache();
+  public function getRows() : array {
+    return $this->reader->getRows();
   }
 
-  public function getRow($primaryKey) : array {
-    return $this->cacheService->getRow($primaryKey);
+  public function getPrimaryKeyColumn() : string {
+    return $this->reader->getPrimaryKeyColumn();
   }
 
-  public function getData() : array {
-    return $this->cacheService->getData();
+  public function setPrimaryKeyColumn(string $columnName) : void {
+    $this->reader->setPrimaryKeyColumn($columnName);
   }
 
 }

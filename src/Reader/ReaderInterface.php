@@ -1,16 +1,18 @@
 <?php
-namespace Civietl\Cache;
+namespace Civietl\Reader;
 
-interface CacheInterface {
+interface ReaderInterface {
 
   public function __construct($primaryKey);
 
-  public function addRow(array $row) : string;
+  public function getColumnNames() : array;
 
-  public function clearCache() : void;
+  public function getRow($id) : array;
 
-  public function getRow($primaryKey) : array;
+  public function getRows() : array;
 
-  public function getData() : array;
+  public function getPrimaryKeyColumn() : string;
+
+  public function setPrimaryKeyColumn(string $columnName) : void;
 
 }
