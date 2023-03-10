@@ -13,8 +13,8 @@ class CsvReader implements ReaderInterface {
   private Reader $csv;
 
   public function __construct($options) {
-    $this->headers = $options['headers'] ?? $options;
-    $this->csv = Reader::createFromPath($options['file'], 'r');
+    $this->headers = $options['headers'] ?? $this->headers;
+    $this->csv = Reader::createFromPath($options['file_path'], 'r');
   }
 
   public function getColumnNames() : array {

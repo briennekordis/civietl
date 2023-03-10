@@ -8,6 +8,10 @@ class ReaderService {
     $this->reader = $reader;
   }
 
+  public function getColumnNames() : array {
+    return $this->reader->getColumnNames();
+  }
+
   public function getRow($columnName, $value) : array {
     return $this->reader->getRow($columnName, $value);
   }
