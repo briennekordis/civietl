@@ -1,5 +1,5 @@
 <?php
-namespace Civietl\Reader;
+namespace Civietl\Writer;
 
 use League\Csv\Writer;
 
@@ -7,7 +7,7 @@ class CsvWriter implements WriterInterface {
   private Writer $csv;
 
   public function __construct($options) {
-    $this->csv->createFromPath($options['csv_output'], 'w');
+    $this->csv = Writer::createFromPath($options['file_path'], 'w');
     $this->csv->insertOne($options['column_names']);
   }
 
