@@ -1,5 +1,6 @@
 {
     "require": {
-        "egulias/email-validator": "^4.0"
+        "egulias/email-validator": "^4.0",
+        "league/csv": "^9.0"
     }
 }
