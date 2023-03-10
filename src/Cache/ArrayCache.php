@@ -1,25 +1,26 @@
 <?php
 namespace Civietl\Cache;
 
-class ArrayCache implements CacheService {
+class ArrayCache implements CacheInterface {
   private array $data;
-  private string $primaryKey;
+  private string $primaryKeyColumn;
 
-  public function __construct($primaryKey) {
-    $this->$primaryKey = $primaryKey;
+  public function __construct($primaryKeyColumn) {
+    $this->$primaryKeyColumn = $primaryKeyColumn;
   }
 
   public function addRow(array $row) : string {
-    $this->data[$row[$this->primaryKey]] = $row;
-    return $row[$this->primaryKey];
+    $id = $row[$this->primaryKeyColumn];
+    $this->data[$id] = $row;
+    return $id;
   }
 
   public function clearCache() : void {
     unset($this->data);
   }
 
-  public function getRow($primaryKey) : array {
-    return $this->data[$primaryKey];
+  public function getRow($id) : array {
+    return $this->data[$id];
   }
 
   public function getData() : array {

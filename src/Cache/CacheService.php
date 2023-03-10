@@ -1,27 +1,27 @@
 <?php
 namespace Civietl\Cache;
 
-class CacheService {
-  private $cacheService;
+class cacheService {
+  private $cache;
 
-  public function __construct(CacheService $cacheService) {
-    $this->cacheService = $cacheService;
+  public function __construct(CacheInterface $cache) {
+    $this->cache = $cache;
   }
 
   public function addRow(array $row) : string {
-    return $this->cacheService->addRow($row);
+    return $this->cache->addRow($row);
   }
 
   public function clearCache() : void {
-    $this->cacheService->clearCache();
+    $this->cache->clearCache();
   }
 
-  public function getRow($primaryKey) : array {
-    return $this->cacheService->getRow($primaryKey);
+  public function getRow($id) : array {
+    return $this->cache->getRow($id);
   }
 
   public function getData() : array {
-    return $this->cacheService->getData();
+    return $this->cache->getData();
   }
 
 }
