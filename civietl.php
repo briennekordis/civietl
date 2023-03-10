@@ -12,23 +12,30 @@ $longopts = ['settings-file:'];
 $cliArguments = getopt($shortopts, $longopts);
 checkRequired($cliArguments);
 
-require_once $cliArgumenSettingts['settings-file'];
+require_once $cliArguments['settings-file'];
 
 
 foreach ($importSettings as $importSetting) {
-  $readerClassName = '\Civietl\ReSettingader\\' . $importSetting['reader_type'];
-  $cacheClassName = '\Civietl\CacheSetting\\' . $importSetting['cache_type'];
+  $readerClassName = '\Civietl\Reader\\' . $importSetting['reader_type'];
+  $cacheClassName = '\Civietl\Cache\\' . $importSetting['cache_type'];
   $writerClassName = '\Civietl\Writer\\' . $importSetting['writer_type'];
 
   $readerOptions['file_path'] = $importSetting['data_path'];
-  $writerOptions['file_path'] = $importSetting['output_path'];
 
-  $reader = new ReaderService(new $readeSettingrClassName($readerOptions));
+  $reader = new ReaderService(new $readerClassName($readerOptions));
   $cache = new CacheService(new $cacheClassName($importSetting['data_primary_key']));
-  $writer = new WriterService(new $writerClassName($writerOptions));
+
 
   $reader->setPrimaryKeyColumn($importSetting['data_primary_key']);
+  $dataWip = $reader->getRows();
+
   $header = $reader->getColumnNames();
+
+  $writerOptions['file_path'] = $importSetting['output_path'];
+  $writerOptions['column_names'] = $header;
+  // FIXME: Transforms here. Move them...I dunno where. settings.php?
+  $writer = new WriterService(new $writerClassName($writerOptions));
+  $writer->writeAll($dataWip);
 }
 
 /**
