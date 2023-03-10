@@ -8,18 +8,18 @@ class CsvReader implements ReaderInterface {
    * @var headers
    * Set to FALSE if the first row isn't column names.
    */
-  private bool $headers = TRUE;
+  private bool $hasHeaders = TRUE;
   private string $primaryKeyColumn;
   private Reader $csv;
 
   public function __construct($options) {
-    $this->headers = $options['headers'] ?? $this->headers;
+    $this->hasHeaders = $options['headers'] ?? $this->hasHeaders;
     $this->csv = Reader::createFromPath($options['file_path'], 'r');
   }
 
   public function getColumnNames() : array {
     $header = [];
-    if ($this->headers) {
+    if ($this->hasHeaders) {
       $this->csv->setHeaderOffset(0);
       $header = $this->csv->getHeader();
 
@@ -38,7 +38,16 @@ class CsvReader implements ReaderInterface {
   }
 
   public function getRows() : array {
-    return (array) $this->csv->getRecords();
+    $rows = [];
+    if ($this->hasHeaders) {
+      $this->csv->setHeaderOffset(0);
+    }
+    $query = \League\Csv\Statement::create();
+    $records = $query->process($this->csv);
+    foreach ($records as $record) {
+      $rows[] = $record;
+    }
+    return $rows;
   }
 
   public function getPrimaryKeyColumn() : string {
