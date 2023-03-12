@@ -11,12 +11,14 @@ class CsvWriter implements WriterInterface {
     $this->csv->insertOne($options['column_names']);
   }
 
-  public function writeOne($row) : void {
+  public function writeOne($row) : array {
     $this->csv->insertOne($row);
+    return [];
   }
 
-  public function writeAll($rows) : void {
+  public function writeAll($rows) : array {
     $this->csv->insertAll($rows);
+    return [];
   }
 
 }

@@ -5,8 +5,8 @@ interface WriterInterface {
 
   public function __construct($options);
 
-  public function writeOne($row) : void;
+  public function writeOne($row) : array;
 
-  public function writeAll($rows) : void;
+  public function writeAll($rows) : array;
 
 }
