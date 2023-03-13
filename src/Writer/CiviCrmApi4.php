@@ -5,7 +5,7 @@ class CivicrmApi4 implements WriterInterface {
   private string $primaryEntity;
 
   public function __construct($options) {
-    $this->primaryEntity = $options['entity'];
+    $this->primaryEntity = $options['civi_primary_entity'];
   }
 
   public function writeOne($row) : array {

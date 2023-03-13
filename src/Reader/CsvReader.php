@@ -15,6 +15,7 @@ class CsvReader implements ReaderInterface {
   public function __construct($options) {
     $this->hasHeaders = $options['headers'] ?? $this->hasHeaders;
     $this->csv = Reader::createFromPath($options['file_path'], 'r');
+    $this->setPrimaryKeyColumn($options['data_primary_key']);
   }
 
   public function getColumnNames() : array {
