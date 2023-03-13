@@ -36,4 +36,6 @@ foreach ($importSettings as $stepName => $importSetting) {
   $writer->writeAll($rows);
   $time_end = microtime(TRUE);
   $executionTime = round($time_end - $time_start, 2);
+  $timings = "$stepName: $executionTime seconds\n";
+  echo $timings;
 }
