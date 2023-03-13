@@ -15,9 +15,16 @@ class Cleanup {
     return $rows;
   }
 
-  /**
-   * @return array contains two arrays - $rows and $errors.
-   */
+  public static function filterInvalidWebsites($rows, $columnName) : array {
+    foreach ($rows as $key => $row) {
+      if (!filter_var($row[$columnName], FILTER_VALIDATE_URL)) {
+        Logging::log("Invalid website in row: " . implode(', ', $row));
+        unset($rows[$key]);
+      }
+    }
+    return $rows;
+  }
+
   public static function filterInvalidEmails($rows, $columnName) : array {
     $errors = [];
     foreach ($rows as $key => $row) {
