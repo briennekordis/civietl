@@ -17,6 +17,7 @@ eval(`cv --cwd=$webroot php:boot`);
 
 $importSettings = U::StartFromStep($importSettings, $cliArguments['start-from']);
 foreach ($importSettings as $stepName => $importSetting) {
+  $time_start = microtime(TRUE);
   $importSetting += $importDefaults;
   $readerClassName = '\Civietl\Reader\\' . $importSetting['reader_type'];
   // $cacheClassName = '\Civietl\Cache\\' . $importSetting['cache_type'];
@@ -33,5 +34,6 @@ foreach ($importSettings as $stepName => $importSetting) {
 
   $writer = new WriterService(new $writerClassName($importSetting['writerOptions']));
   $writer->writeAll($rows);
-
+  $time_end = microtime(TRUE);
+  $executionTime = round($time_end - $time_start, 2);
 }
