@@ -22,10 +22,17 @@ class Columns {
     return $rows;
   }
 
-  /**
-   * @var columnsToRename
-   *   array in format `['oldname1' => 'newname1', 'oldname2' => 'newname2', etc.]`
-   */
+  public static function deleteColumns(array $rows, array $columnsToDelete) : array {
+    foreach ($rows as &$row) {
+      foreach ($row as $columnName => $dontcare) {
+        if (in_array($columnName, $columnsToDelete)) {
+          unset($row[$columnName]);
+        }
+      }
+    }
+    return $rows;
+  }
+
   public static function deleteAllColumnsExcept(array $rows, array $columnsToKeep) : array {
     foreach ($rows as &$row) {
       foreach ($row as $columnName => $dontcare) {
