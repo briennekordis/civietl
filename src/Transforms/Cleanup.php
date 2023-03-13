@@ -1,6 +1,8 @@
 <?php
 namespace Civietl\Transforms;
 
+use Civietl\Logging;
+
 class Cleanup {
 
   /**
@@ -26,10 +28,9 @@ class Cleanup {
   }
 
   public static function filterInvalidEmails($rows, $columnName) : array {
-    $errors = [];
     foreach ($rows as $key => $row) {
       if (!filter_var($row[$columnName], FILTER_VALIDATE_EMAIL)) {
-        \Civi::log('civietl')->error("Invalid email in row: " . implode(', ', $row));
+        Logging::log("Invalid email in row: " . implode(', ', $row));
         unset($rows[$key]);
       }
     }

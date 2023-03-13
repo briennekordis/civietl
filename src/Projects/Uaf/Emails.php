@@ -15,12 +15,13 @@ class Emails {
     // Log and remove invalid email addresses.
     $rows = T\Cleanup::filterInvalidEmails($rows, 'Email');
     // Delete unused columns. Not necessary but easier (and marginally faster) to work with.
-    $rows = T\Columns::deleteColumns($rows, ['LGL Email ID', 'Constituent Name', 'Is Valid']);
+    $rows = T\Columns::deleteColumns($rows, ['LGL Email ID', 'Constituent Name', 'Is Valid?']);
     // Rename some columns that are one-to-one with Civi.
     $rows = T\Columns::renameColumns($rows, [
       'LGL Constituent ID' => 'external_identifier',
       'Email' => 'email',
       'Email Type' => 'location_type_id:label',
+      'Is Preferred?' => 'is_primary',
     ]);
     // Create any missing website types in the option values table.
     $locationTypes = T\RowFilters::getUniqueValues($rows, 'location_type_id:label');

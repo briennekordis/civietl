@@ -20,8 +20,13 @@ class Websites {
     // Trim and lowercase URLs.
     $rows = T\Text::lowercase($rows, ['url']);
     $rows = T\Text::trim($rows, ['url']);
+
     // Add protocol if necessary.
     $rows = T\Cleanup::addUrlProtocol($rows, 'url');
+
+    // Log and remove any invalid websites.
+    $rows = T\Cleanup::filterInvalidWebsites($rows, 'url');
+
     // Website type ID: "Website" to "Main".
     $rows = T\ValueTransforms::valueMapper($rows, 'website_type_id:label', ['Website' => 'Main']);
     // Create any missing website types in the option values table.

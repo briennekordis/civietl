@@ -11,6 +11,7 @@ use Civietl\Utils as U;
 
 $cliArguments = U::ParseCli();
 require_once $cliArguments['settings-file'];
+Logging::setLogFolder($logFolder);
 // Perform CiviCRM bootstrap
 // phpcs:ignore
 eval(`cv --cwd=$webroot php:boot`);
