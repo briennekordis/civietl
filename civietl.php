@@ -15,6 +15,7 @@ require_once $cliArguments['settings-file'];
 // phpcs:ignore
 eval(`cv --cwd=$webroot php:boot`);
 
+$importSettings = U::StartFromStep($importSettings, $cliArguments['start-from']);
 foreach ($importSettings as $stepName => $importSetting) {
   $importSetting += $importDefaults;
   $readerClassName = '\Civietl\Reader\\' . $importSetting['reader_type'];

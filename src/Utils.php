@@ -2,12 +2,13 @@
 namespace Civietl;
 
 class Utils {
+
   /**
    * Handles command-line arguments.
    */
   public static function ParseCli() : array {
     $shortopts = '';
-    $longopts = ['settings-file:'];
+    $longopts = ['settings-file:', 'start-from:'];
     $cliArguments = getopt($shortopts, $longopts);
     self::checkRequired($cliArguments);
     return $cliArguments;
@@ -25,6 +26,18 @@ class Utils {
     if (isset($missing)) {
       echo "You are missing the following required arguments:$missing";
       exit(3);
+    }
+  }
+
+  public static function StartFromStep(array $importSettings, ?string $firstStep) : array {
+    if (!$firstStep) {
+      return $importSettings;
+    }
+    foreach ($importSettings as $stepName => $dontcare) {
+      if ($firstStep === $stepName) {
+        return $importSettings;
+      }
+      unset($importSettings[$stepName]);
     }
   }
 
