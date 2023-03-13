@@ -9,6 +9,7 @@ class CiviCRM {
    *   array of strings
    */
   public static function createOptionValues(string $optionGroupName, array $labels) : void {
+    // FIXME: This can be done in less/faster code by using "Save", see "createLocationTypes" below.
     $existingValues = \Civi\Api4\OptionValue::get(FALSE)
       ->addSelect('label')
       ->addWhere('option_group_id:name', '=', $optionGroupName)
@@ -23,6 +24,20 @@ class CiviCRM {
         ->addValue('label', $label)
         ->execute();
     }
+  }
+
+  /**
+   * Create missing location types.
+   */
+  public static function createLocationTypes(array $locationTypes) : void {
+    $api = \Civi\Api4\LocationType::save(FALSE)->setMatch(['name']);
+    foreach ($locationTypes as $locationType) {
+      $api->addRecord([
+        'name' => $locationType,
+        'label' => $locationType,
+      ]);
+    }
+    $api->execute();
   }
 
   /**
