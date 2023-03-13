@@ -15,4 +15,18 @@ class Cleanup {
     return $rows;
   }
 
+  /**
+   * @return array contains two arrays - $rows and $errors.
+   */
+  public static function filterInvalidEmails($rows, $columnName) : array {
+    $errors = [];
+    foreach ($rows as $key => $row) {
+      if (!filter_var($row[$columnName], FILTER_VALIDATE_EMAIL)) {
+        \Civi::log('civietl')->error("Invalid email in row: " . implode(', ', $row));
+        unset($rows[$key]);
+      }
+    }
+    return $rows;
+  }
+
 }
