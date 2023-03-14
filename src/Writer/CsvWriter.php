@@ -10,16 +10,14 @@ class CsvWriter implements WriterInterface {
     $this->csv = Writer::createFromPath($options['file_path'], 'w');
   }
 
-  public function writeOne($row) : array {
+  public function writeOne($row) : void {
     $this->csv->insertOne($row);
-    return [];
   }
 
-  public function writeAll($rows) : array {
+  public function writeAll($rows) : void {
     $columnNames = array_keys(reset($rows));
     $this->csv->insertOne($columnNames);
     $this->csv->insertAll($rows);
-    return [];
   }
 
 }

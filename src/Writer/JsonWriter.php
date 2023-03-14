@@ -10,17 +10,15 @@ class JsonWriter implements WriterInterface {
     $this->csv = Writer::createFromPath($options['file_path'], 'w');
   }
 
-  public function writeOne($row) : array {
+  public function writeOne($row) : void {
     $row = json_encode($row);
     $this->csv->insertOne([$row]);
-    return [];
   }
 
-  public function writeAll($rows) : array {
+  public function writeAll($rows) : void {
     foreach ($rows as $row) {
       $this->writeOne($row);
     }
-    return [];
   }
 
 }
