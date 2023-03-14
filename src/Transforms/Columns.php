@@ -51,4 +51,11 @@ class Columns {
     return $rows;
   }
 
+  public static function copyColumn(array $rows, string $oldColumnName, string $newColumnName) : array {
+    foreach ($rows as &$row) {
+      $row[$newColumnName] = $row[$oldColumnName];
+    }
+    return $rows;
+  }
+
 }
