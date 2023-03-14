@@ -1,6 +1,8 @@
 <?php
 namespace Civietl\Writer;
 
+use Civietl\Logging;
+
 class CivicrmApi4 implements WriterInterface {
   private string $primaryEntity;
 
@@ -15,7 +17,8 @@ class CivicrmApi4 implements WriterInterface {
       'values' => $row,
     ]);
     if ($result['error_message'] ?? FALSE) {
-      $logEntry = ['Error' => $result['error_message']] + $row;
+      Logging::log("Failed to import: $row");
+      Logging::log("Error: $result");
     }
     return $logEntry;
   }
