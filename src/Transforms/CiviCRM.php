@@ -41,6 +41,19 @@ class CiviCRM {
   }
 
   /**
+   * Create missing groups.
+   */
+  public static function createGroups(array $groups) : void {
+    $api = \Civi\Api4\Group::save(FALSE)->setMatch(['title']);
+    foreach ($groups as $group) {
+      $api->addRecord([
+        'title' => $group,
+      ]);
+    }
+    $api->execute();
+  }
+
+  /**
    * Return one or more fields from a record based on an existing value.
    * E.g. from external_identifier, return the contact_id.
    */
