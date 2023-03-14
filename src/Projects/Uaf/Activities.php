@@ -11,7 +11,6 @@ class Activities {
   public function transforms(array $rows) : array {
     $rows = T\Columns::deleteAllColumnsExcept($rows, [
       'LGL Constituent ID',
-      'LGL Gift ID',
       'Task name',
       'Task description',
       'Task type',
@@ -32,27 +31,28 @@ class Activities {
     // Get assignee contact IDs.
     $rows = T\CiviCRM::lookup($rows, 'Contact', 'Task owner', 'display_name', ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'assignee_contact_id']);
-    // Remap statuses.
+    // We need a source_contact_id, use target_contact_id.
+    $rows = T\Columns::copyColumn($rows, 'target_contact_id', 'source_contact_id');
+    // Ugh, Task type needs trimming.
+    $rows = T\Text::trim($rows, ['Task type']);
+    // Remap statuses and types.
     $rows = T\ValueTransforms::valueMapper($rows, 'Task status', ['Open' => 'Scheduled', 'Completed' => 'Complete']);
     $rows = T\ValueTransforms::valueMapper($rows, 'Task type', [
-      'Open' => 'Scheduled', 'Completed' => 'Complete']);
-    
+      'Call' => 'Phone Call',
+      'Final Report' => 'LGL Final Report',
+      'Mailing' => 'Bulk Email',
+      'Other' => 'LGL Other',
+      'Proposal' => 'LGL Proposal',
+      'Thank You Card' => 'LGL Thank You Card',
+      '' => 'LGL Other',
+    ]);
 
     $rows = T\Columns::renameColumns($rows, [
-      'Call' => 'Phone Call',
-      
-Email
-Final Report 
-Mailing
-Meeting
-Other
-Proposal
-Thank You Card
-
       'Task name' => 'subject',
-      'Task description' => 'description',
+      'Task description' => 'details',
       'Task status' => 'status_id:label',
       'Created date' => 'activity_date_time',
+      'Task type' => 'activity_type_id:label',
     ]);
     return $rows;
   }
