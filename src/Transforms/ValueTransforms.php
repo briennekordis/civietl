@@ -14,7 +14,11 @@ class ValueTransforms {
   public static function valueMapper(array $rows, string $columnName, array $mapping, ?string $newColumn = NULL) : array {
     $newColumn ??= $columnName;
     foreach ($rows as &$row) {
-      if ($mapping[$row[$columnName]] ?? FALSE) {
+      // This ensures there's always a "newColumn" element even if there's no value mapping.
+      if ($newColumn) {
+        $row[$newColumn] = '';
+      }
+      if (array_key_exists($row[$columnName], $mapping)) {
         $row[$newColumn] = $mapping[$row[$columnName]];
       }
     }
