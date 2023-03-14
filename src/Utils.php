@@ -6,9 +6,9 @@ class Utils {
   /**
    * Handles command-line arguments.
    */
-  public static function ParseCli() : array {
+  public static function parseCli() : array {
     $shortopts = '';
-    $longopts = ['settings-file:', 'start-from:'];
+    $longopts = ['settings-file:', 'run-only:', 'start-from:', 'end-on:'];
     $cliArguments = getopt($shortopts, $longopts);
     self::checkRequired($cliArguments);
     $cliArguments = self::fillEmpty($cliArguments);
@@ -41,16 +41,31 @@ class Utils {
     return $cliArguments;
   }
 
-  public static function StartFromStep(array $importSettings, string $firstStep) : array {
+  public static function filterSteps(array $importSettings, array $cliArguments) : array {
+    $firstStep = $lastStep = $cliArguments['run-only'] ?? NULL;
+    $firstStep ??= $cliArguments['start-from'] ?? NULL;
+    $lastStep ??= $cliArguments['end-on'] ?? NULL;
     if (!$firstStep) {
       return $importSettings;
     }
+    // First step.
     foreach ($importSettings as $stepName => $dontcare) {
       if ($firstStep === $stepName) {
-        return $importSettings;
+        break;
       }
       unset($importSettings[$stepName]);
     }
+    // Last step.
+    $pastLastStep = FALSE;
+    foreach ($importSettings as $stepName => $dontcare) {
+      if ($pastLastStep) {
+        unset($importSettings[$stepName]);
+      }
+      if ($lastStep === $stepName) {
+        $pastLastStep = TRUE;
+      }
+    }
+    return $importSettings;
   }
 
 }

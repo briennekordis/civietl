@@ -9,14 +9,14 @@ use Civietl\Reader\ReaderService;
 use Civietl\Writer\WriterService;
 use Civietl\Utils as U;
 
-$cliArguments = U::ParseCli();
+$cliArguments = U::parseCli();
 require_once $cliArguments['settings-file'];
 Logging::setLogFolder($logFolder);
 // Perform CiviCRM bootstrap
 // phpcs:ignore
 eval(`cv --cwd=$webroot php:boot`);
 
-$importSettings = U::StartFromStep($importSettings, $cliArguments['start-from']);
+$importSettings = U::filterSteps($importSettings, $cliArguments);
 foreach ($importSettings as $stepName => $importSetting) {
   $time_start = microtime(TRUE);
   $importSetting += $importDefaults;
