@@ -44,4 +44,11 @@ class Columns {
     return $rows;
   }
 
+  public static function newColumnWithConstant(array $rows, string $newColumnName, mixed $constant) : array {
+    foreach ($rows as &$row) {
+      $row[$newColumnName] = $constant;
+    }
+    return $rows;
+  }
+
 }
