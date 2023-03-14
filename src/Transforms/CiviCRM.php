@@ -44,17 +44,25 @@ class CiviCRM {
    * Return one or more fields from a record based on an existing value.
    * E.g. from external_identifier, return the contact_id.
    */
-  public static function lookup(array $rows, string $entity, string $lookupField, array $returnFields) : array {
+  public static function lookup(array $rows, string $entity, string $columnName, string $lookupField, array $returnFields) : array {
     // Get all the lookup data in one query, much faster than one query per row.
     $lookupData = (array) civicrm_api4($entity, 'get', [
       'select' => [$lookupField] + $returnFields,
       'where' => [[$lookupField, 'IS NOT NULL']],
       'checkPermissions' => FALSE,
     ]);
-    // Re-index by lookup field.
+    // Reindex the cache data for easiest lookup speed.
     $lookupData = array_combine(array_column($lookupData, $lookupField), $lookupData);
+    // For when the lookup value is blank.
+    $blankLookup = array_fill_keys($returnFields, '');
+
     foreach ($rows as &$row) {
-      $row += $lookupData[$row[$lookupField]];
+      if ($row[$columnName]) {
+        $row += $lookupData[$row[$columnName]];
+      }
+      else {
+        $row += $blankLookup;
+      }
     }
     return $rows;
   }

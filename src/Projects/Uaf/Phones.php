@@ -28,7 +28,7 @@ class Phones {
     T\CiviCRM::createLocationTypes($locationTypes);
     $phoneTypes = T\RowFilters::getUniqueValues($rows, 'phone_type_id:label');
     T\CiviCRM::createOptionValues('phone_type', $phoneTypes);
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', 'external_identifier', 'external_identifier', ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
     return $rows;
   }
