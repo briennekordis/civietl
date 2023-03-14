@@ -15,7 +15,7 @@ class ValueTransforms {
     $newColumn ??= $columnName;
     foreach ($rows as &$row) {
       // This ensures there's always a "newColumn" element even if there's no value mapping.
-      if ($newColumn) {
+      if ($columnName !== $newColumn) {
         $row[$newColumn] = '';
       }
       if (array_key_exists($row[$columnName], $mapping)) {
