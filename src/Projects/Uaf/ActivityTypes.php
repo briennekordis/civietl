@@ -1,8 +1,6 @@
 <?php
 namespace Civietl\Projects\Uaf;
 
-use Civietl\Transforms as T;
-
 class ActivityTypes {
 
   /**
