@@ -7,9 +7,11 @@ class Text {
    * Trim values in listed columns.
    */
   public static function trim(array $rows, array $columns) : array {
-    foreach ($rows as $key => $value) {
-      if (in_array($key, $columns)) {
-        $rows[$key] = trim($value);
+    foreach ($rows as &$row) {
+      foreach ($row as $columnName => $value) {
+        if (in_array($columnName, $columns)) {
+          $row[$columnName] = trim($value);
+        }
       }
     }
     return $rows;
@@ -19,9 +21,11 @@ class Text {
    * Lowercase values in listed columns.
    */
   public static function lowercase(array $rows, array $columns) : array {
-    foreach ($rows as $key => $value) {
-      if (in_array($key, $columns)) {
-        $rows[$key] = lowercase($value);
+    foreach ($rows as &$row) {
+      foreach ($row as $columnName => $value) {
+        if (in_array($columnName, $columns)) {
+          $row[$columnName] = strtolower($value);
+        }
       }
     }
     return $rows;
