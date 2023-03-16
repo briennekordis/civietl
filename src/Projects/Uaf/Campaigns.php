@@ -11,6 +11,7 @@ class Campaigns {
   public function transforms(array $rows) : array {
     // Remove columns that will not be imported.
     $rows = T\Columns::deleteAllColumnsExcept($rows, [
+      'LGL Campaign ID',
       'Name',
       'Description',
       'Goal',
@@ -20,6 +21,7 @@ class Campaigns {
     ]);
     // Rename the columns that will be imported to match CiviCRM fields.
     $rows = T\Columns::renameColumns($rows, [
+      'LGL Campaign ID' => 'external_identifier',
       'Name' => 'title',
       'Description' => 'description',
       'Goal' => 'goal_revenue',
