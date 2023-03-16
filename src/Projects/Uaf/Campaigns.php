@@ -27,6 +27,8 @@ class Campaigns {
       'End Date' => 'end_date',
       'Is Active?' => 'is_active',
     ]);
+    // Remap true to 1 and false to 0 for is_active.
+    $rows = T\ValueTransforms::valueMapper($rows, 'is_active', ['false' => 0, 'true' => 1]);
     return $rows;
   }
 
