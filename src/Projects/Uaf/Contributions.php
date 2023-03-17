@@ -49,10 +49,13 @@ class Contributions {
       // 'Vehicle Name' => 'vehicle_external_identifier',
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
-    $rows = T\RowFilters::randomSample($rows, 3);
+    $rows = T\RowFilters::randomSample($rows, 5);
+    // Create any missing payment methods in the option values table.
+    $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id.label');
+    T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
     // Remap true to 1 and false to 0 for Anonymous_gift.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['false' => 0, 'true' => 1]);
-    // Add a column that marks these Contributions as 'Complete'.
+    // Add a column that gives these Contributions a 'Completed' status.
     $rows = T\Columns::newColumnWithConstant($rows, 'contribution_status_id:label', 'Completed');
     // Look up and reutrn the id of Entities this Contribution is tied to.
     $rows = T\CiviCRM::lookup($rows, 'Contact', 'contact_external_identifier', 'external_identifier', ['id']);
