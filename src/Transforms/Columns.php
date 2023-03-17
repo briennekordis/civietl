@@ -9,7 +9,7 @@ class Columns {
    */
   public static function renameColumns(array $rows, array $columnsToRename) : array {
     // Ensure all the columns to rename exist.
-    $missingColumns = array_diff(array_keys($columnsToRename), array_keys($rows[0]));
+    $missingColumns = array_diff(array_keys($columnsToRename), array_keys(reset($rows)));
     if ($missingColumns) {
       throw new \Exception('Error in ' . __FUNCTION__ . ': These columns don\'t exist in the data: ' . implode(', ', $missingColumns));
     }
