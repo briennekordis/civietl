@@ -31,4 +31,21 @@ class Text {
     return $rows;
   }
 
+  /**
+   * Replace a string within a column.
+   */
+  public static function replace($rows, string $columnName, bool $useReg, string $search, string $replace) {
+    foreach ($rows as &$row) {
+      foreach ($row as $columnName => $value) {
+        if ($useReg) {
+          $row[$columnName] = preg_replace($search, $replace, $value);
+        }
+        elseif (!$useReg) {
+          $row[$columnName] = str_replace($search, $replace, $value);
+        }
+      }
+    }
+    return $rows;
+  }
+
 }
