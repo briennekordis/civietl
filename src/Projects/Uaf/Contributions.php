@@ -48,11 +48,13 @@ class Contributions {
       // 'Gift batch ID',
       // 'Vehicle Name',
     ]);
+    // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
+    $rows = T\RowFilters::randomSample($rows, 10);
+    // // Remap true to 1 and false to 0 for Anonymous gift?.
+    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['false' => 0, 'true' => 1]);
     // Look up and reutrn the id of Entities this Contribution is tied to.
     $rows = T\CiviCRM::lookup($rows, 'Contact', 'external_identifier', 'external_identifier', ['id']);
     $rows = T\CiviCRM::lookup($rows, 'Campaign', 'campaign_external_identifier', 'external_identifier', ['id']);
-    // Remap true to 1 and false to 0 for is_active.
-    $rows = T\ValueTransforms::valueMapper($rows, 'is_active', ['false' => 0, 'true' => 1]);
     return $rows;
   }
 
