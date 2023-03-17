@@ -10,23 +10,25 @@ class ContributionNotes {
    */
   public function transforms(array $rows) : array {
     // Delete unused columns. Not necessary but easier (and marginally faster) to work with.
-    $rows = T\Columns::deleteColumns($rows, [
+    $rows = T\Columns::deleteAllColumnsExcept($rows, [
       'LGL Gift ID',
       'Gift note',
-      'Gift date'
+      'Gift date',
     ]);
     // Rename some columns that are one-to-one with Civi.
     $rows = T\Columns::renameColumns($rows, [
       'LGL Gift ID' => 'external_identifier',
-      'Note' => 'note',
+      'Gift note' => 'note',
       'Gift date' => 'note_date',
     ]);
-    $rows = T\CiviCRM::lookup($rows, 'Contribution', 'external_identifier', 'external_identifier', ['id']);
-    $rows = T\Columns::renameColumns($rows, ['id' => 'entity_id']);
+    // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
+    $rows = T\RowFilters::randomSample($rows, 5);
+    // $rows = T\CiviCRM::lookup($rows, 'Contribution', 'external_identifier', 'external_identifier', ['id']);
+    // $rows = T\Columns::renameColumns($rows, ['id' => 'entity_id']);
     $rows = T\Columns::newColumnWithConstant($rows, 'entity_table', 'civicrm_contribution');
     $rows = T\Columns::copyColumn($rows, 'note_date', 'modified_date');
+    $rows = T\Text::replace($rows, 'note', FALSE, 'Currency: USD.', '');
     $rows = T\Text::trim($rows, ['note']);
-    // Make a Text transform for stipping out Currency: USD ?
     return $rows;
   }
 
