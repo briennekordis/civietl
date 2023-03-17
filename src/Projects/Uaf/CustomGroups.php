@@ -1,7 +1,7 @@
 <?php
 namespace Civietl\Projects\Uaf;
 
-class CustomGroup {
+class CustomGroups {
 
   /**
    * Do all the transforms associated with this step.

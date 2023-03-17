@@ -1,7 +1,7 @@
 <?php
 namespace Civietl\Projects\Uaf;
 
-class CustomField {
+class CustomFields {
 
   /**
    * Do all the transforms associated with this step.
