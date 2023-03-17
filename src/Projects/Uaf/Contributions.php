@@ -46,15 +46,20 @@ class Contributions {
       'Anonymous gift?' => 'Additional_Contribution_Data.Anonymous_gift',
       // 'Gift owner',
       // 'Gift batch ID',
-      // 'Vehicle Name',
+      // 'Vehicle Name' => 'vehicle_external_identifier',
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
-    $rows = T\RowFilters::randomSample($rows, 10);
-    // // Remap true to 1 and false to 0 for Anonymous gift?.
+    $rows = T\RowFilters::randomSample($rows, 3);
+    // Remap true to 1 and false to 0 for Anonymous_gift.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['false' => 0, 'true' => 1]);
+    // Add a column that marks these Contributions as 'Complete'.
+    $rows = T\Columns::newColumnWithConstant($rows, 'contribution_status_id:label', 'Completed');
     // Look up and reutrn the id of Entities this Contribution is tied to.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'external_identifier', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', 'contact_external_identifier', 'external_identifier', ['id']);
+    $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
     $rows = T\CiviCRM::lookup($rows, 'Campaign', 'campaign_external_identifier', 'external_identifier', ['id']);
+    $rows = T\Columns::renameColumns($rows, ['id' => 'campaign_id']);
+    // $rows = T\CiviCRM::lookup($rows, '', 'vehicle_external_identifier', 'external_identifier', ['id']);
     return $rows;
   }
 
