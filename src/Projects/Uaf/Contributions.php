@@ -41,7 +41,7 @@ class Contributions {
       'Gift Amount' => 'total_amount',
       'Gift date' => 'receive_date',
       'Deposit Date' => 'Additional_Contribution_Data.Deposited_Date',
-      'Payment type' => 'payment_instrument_id.label',
+      'Payment type' => 'payment_instrument_id:label',
       'Check/Reference No.' => 'check_number',
       'Anonymous gift?' => 'Additional_Contribution_Data.Anonymous_gift',
       // 'Gift owner',
@@ -50,8 +50,8 @@ class Contributions {
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
     $rows = T\RowFilters::randomSample($rows, 5);
-    // Create any missing payment methods in the option values table.
-    $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id.label');
+    // Create any missing payment methods in the OptionValues table.
+    $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
     T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
     // Remap true to 1 and false to 0 for Anonymous_gift.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['false' => 0, 'true' => 1]);
