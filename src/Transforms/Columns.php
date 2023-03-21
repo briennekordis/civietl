@@ -58,4 +58,20 @@ class Columns {
     return $rows;
   }
 
+  /**
+   * Note that when called, the $columnNames should be passed in order of preference as to which value should be selected if both/all columns have a value.
+   */
+  public static function coalesceColumns(array $rows, array $columnNames, string $outputColumn) {
+    foreach ($rows as &$row) {
+      foreach ($columnNames as $column => $dontcare) {
+        $value = $row[$columnNames[$column]] ?? NULL;
+        if (!empty($value)) {
+          $row[$outputColumn] = $value;
+          break;
+        }
+      }
+    }
+    return $rows;
+  }
+
 }

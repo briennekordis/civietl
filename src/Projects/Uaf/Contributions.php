@@ -16,7 +16,7 @@ class Contributions {
       'LGL Parent Gift ID',
       'LGL Campaign ID',
       'Fund',
-      'Appeal',
+      'LGL Appeal ID',
       'Gift Category',
       'Gift note',
       'Gift Amount',
@@ -36,7 +36,7 @@ class Contributions {
       // 'LGL Parent Gift ID',
       'LGL Campaign ID' => 'campaign_external_identifier',
       'Fund' => 'financial_type_id:label',
-      // 'Appeal' => 'source',
+      'LGL Appeal ID' => 'appeal_external_identifier',
       // 'Gift Category',
       'Gift Amount' => 'total_amount',
       'Gift date' => 'receive_date',
@@ -49,19 +49,32 @@ class Contributions {
       // 'Vehicle Name' => 'vehicle_external_identifier',
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
-    $rows = T\RowFilters::randomSample($rows, 5);
+    // $rows = T\RowFilters::randomSample($rows, 5);
     // Create any missing payment methods in the OptionValues table.
     $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
     T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
     // Remap true to 1 and false to 0 for Anonymous_gift.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['false' => 0, 'true' => 1]);
+    // $rows = T\ValueTransforms::toArray($rows, 'Additional_Contribution_Data.Anonymous_gift');
     // Add a column that gives these Contributions a 'Completed' status.
     $rows = T\Columns::newColumnWithConstant($rows, 'contribution_status_id:label', 'Completed');
-    // Look up and reutrn the id of Entities this Contribution is tied to.
+
+    // Contact
+    // Look up and reutrn the id of the Contact this Contribution is connected to.
     $rows = T\CiviCRM::lookup($rows, 'Contact', 'contact_external_identifier', 'external_identifier', ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
-    $rows = T\CiviCRM::lookup($rows, 'Campaign', 'campaign_external_identifier', 'external_identifier', ['id']);
+
+    // Campaign
+    // Remap 0 to an empty string for the camapaign and/or appeal external ids.
+    $rows = T\ValueTransforms::valueMapper($rows, 'campaign_external_identifier', ['0' => '']);
+    $rows = T\ValueTransforms::valueMapper($rows, 'appeal_external_identifier', ['0' => '']);
+    // If the Contribution has an Appeal id, use that, if not, use the Campaign id if not null.
+    $rows = T\Columns::coalesceColumns($rows, ['appeal_external_identifier', 'campaign_external_identifier'], 'campaign_or_appeal');
+    // Look up and reutrn the id of the Campaign this Contribution is connected to.
+    $rows = T\CiviCRM::lookup($rows, 'Campaign', 'campaign_or_appeal', 'external_identifier', ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'campaign_id']);
+
+    // Vehicle
     // $rows = T\CiviCRM::lookup($rows, '', 'vehicle_external_identifier', 'external_identifier', ['id']);
     return $rows;
   }
