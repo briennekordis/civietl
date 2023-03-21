@@ -34,13 +34,13 @@ class Text {
   /**
    * Replace a string within a column.
    */
-  public static function replace($rows, string $columnName, bool $useReg, string $search, string $replace) {
+  public static function replace(array $rows, string $columnName, string $search, string $replace, bool $useRegex) {
     foreach ($rows as &$row) {
       foreach ($row as $columnName => $value) {
-        if ($useReg) {
+        if ($useRegex) {
           $row[$columnName] = preg_replace($search, $replace, $value);
         }
-        elseif (!$useReg) {
+        elseif (!$useRegex) {
           $row[$columnName] = str_replace($search, $replace, $value);
         }
       }

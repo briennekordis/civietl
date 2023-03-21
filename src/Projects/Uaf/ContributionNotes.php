@@ -27,7 +27,7 @@ class ContributionNotes {
     // $rows = T\Columns::renameColumns($rows, ['id' => 'entity_id']);
     $rows = T\Columns::newColumnWithConstant($rows, 'entity_table', 'civicrm_contribution');
     $rows = T\Columns::copyColumn($rows, 'note_date', 'modified_date');
-    $rows = T\Text::replace($rows, 'note', FALSE, 'Currency: USD.', '');
+    $rows = T\Text::replace($rows, 'note', 'Currency: USD.', '', FALSE);
     $rows = T\Text::trim($rows, ['note']);
     return $rows;
   }
