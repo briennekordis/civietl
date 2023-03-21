@@ -25,4 +25,13 @@ class ValueTransforms {
     return $rows;
   }
 
+  public static function toArray(array $rows, string $columnName) {
+    foreach ($rows as &$row) {
+      foreach ($row as $columnName => $value) {
+        $row[$columnName] = array($value);
+      }
+    }
+    return $rows;
+  }
+
 }
