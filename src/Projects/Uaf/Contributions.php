@@ -54,7 +54,7 @@ class Contributions {
     $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
     T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
     // Remap true to 1 and false to 0 for Anonymous_gift.
-    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['false' => 0, 'true' => 1]);
+    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['FALSE' => 0, 'TRUE' => 1]);
     // $rows = T\ValueTransforms::toArray($rows, 'Additional_Contribution_Data.Anonymous_gift');
     // Add a column that gives these Contributions a 'Completed' status.
     $rows = T\Columns::newColumnWithConstant($rows, 'contribution_status_id:label', 'Completed');
