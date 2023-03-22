@@ -19,7 +19,7 @@ class StepTwo {
       'LGL Constituent ID' => 'external_identifier',
     ]);
     // Split Spouses into separate contact records.
-    $rows = T\Cleanup::splitSpouses($rows, 'external_identifier');
+    $rows = T\Cleanup::splitContacts($rows, 'external_identifier');
     // Split the Spouse Name into separate strings.
     $rows = T\Text::stringSplit($rows, 'Spouse Name');
     // For testing - just show 5 rows.

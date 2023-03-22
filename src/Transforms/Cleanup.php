@@ -37,4 +37,17 @@ class Cleanup {
     return $rows;
   }
 
+  /**
+   * The columnName passed into this function should be the external identifier.
+   */
+  public static function splitContacts(array $rows, string $columnName) {
+    foreach ($rows as &$row) {
+      $pattern = '/$/';
+      $replacement = 's';
+      $subject = &$row[$columnName];
+      $row['spouseExID'] = preg_replace($pattern, $replacement, $subject);
+    }
+    return $rows;
+  }
+
 }
