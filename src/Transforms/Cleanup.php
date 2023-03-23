@@ -58,15 +58,16 @@ class Cleanup {
       $separator = ' ';
       $string = &$row[$columnName];
       $names = explode($separator, $string);
-      $suffixes = ['Jr.']
+      $suffixes = ['Jr.'];
       if (count($names) === 2) {
         $row['first_name'] = $names[0];
         $row['last_name'] = $names[1];
       }
-      else if (in_array($suffixes, $names)) {
+      elseif (in_array($suffixes, $names)) {
         $row['suffix'] = end($names);
       }
     }
     return $rows;
   }
+
 }
