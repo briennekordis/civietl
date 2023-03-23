@@ -41,21 +41,6 @@ class CiviCRM {
   }
 
   /**
-   * Create contact sub types.
-   */
-  public static function createContactSubtypes(array $contactSubtypes) : void {
-    $api = \Civi\Api4\ContactType::save(FALSE)->setMatch(['name']);
-    foreach ($contactSubtypes as $contactSubtype) {
-      $api->addRecord([
-        'name' => $contactSubtype,
-        'label' => $contactSubtype,
-        'parent_id.name' => 'Organization',
-      ]);
-    }
-    $api->execute();
-  }
-
-  /**
    * Create missing groups.
    */
   public static function createGroups(array $groups) : void {
