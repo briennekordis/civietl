@@ -1,6 +1,6 @@
 <?php
 $clientName = 'uaf';
-require_once("$clientName.settings.local.php");
+require_once "$clientName.settings.local.php";
 $logFolder = "$workroot/errors";
 $importDefaults = [
   'project_name' => 'Uaf',
@@ -174,9 +174,27 @@ $importSettings = [
       'data_primary_key' => '',
     ],
     'writerOptions' => [
-      'civi_primary_entity' => 'Notes',
+      'civi_primary_entity' => 'Note',
       'file_path' => "$workroot/data/tempConNotes.csv",
     ],
     'writer_type' => 'CsvWriter',
+  ],
+  'RelationshipTypes' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/relationshipTypes.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'RelationshipType',
+    ],
+  ],
+  'Relationships' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/constituent_relationships.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Relationship',
+    ],
   ],
 ];
