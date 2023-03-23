@@ -63,6 +63,7 @@ class Columns {
    */
   public static function coalesceColumns(array $rows, array $columnNames, string $outputColumn) {
     foreach ($rows as &$row) {
+      $row[$outputColumn] = NULL;
       foreach ($columnNames as $column => $dontcare) {
         $value = $row[$columnNames[$column]] ?? NULL;
         if (!empty($value)) {
