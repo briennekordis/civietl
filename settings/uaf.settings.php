@@ -22,6 +22,29 @@ $importSettings = [
       'civi_primary_entity' => 'Contact',
     ],
   ],
+  // 'StepTwo' => [
+  //   'readerOptions' => [
+  //     // required for CsvReader: file_path, data_primary_key.
+  //     'file_path' => "$workroot/raw data/spouse_test.csv",
+  //     'data_primary_key' => 'LGL Constituent ID',
+  //   ],
+  //   'writerOptions' => [
+  //     // required for CsvWriter/JsonWriter: file_path.
+  //     'file_path' => "$workroot/data/contacts2.csv",
+  //     // required for CiviCrmApi4: civi_primary_entity.
+  //     'civi_primary_entity' => 'Contact',
+  //   ],
+  // ],
+  'ContactSubtypes' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/contact_subtypes.csv",
+      'data_primary_key' => 'Contact Type ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'ContactType',
+      'file_path' => "$workroot/data/tempCT.csv",
+    ],
+  ],
   'Websites' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/websites.csv",
@@ -98,16 +121,6 @@ $importSettings = [
       'file_path' => "$workroot/data/tempFT.csv",
     ],
   ],
-  'Campaigns' => [
-    'readerOptions' => [
-      'file_path' => "$workroot/raw data/full_archive/campaigns.csv",
-      'data_primary_key' => 'LGL Campaign ID',
-    ],
-    'writerOptions' => [
-      'civi_primary_entity' => 'Campaign',
-      'file_path' => "$workroot/data/tempCmp.csv",
-    ],
-  ],
   'OptionGroups' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/optionGroups.csv",
@@ -146,6 +159,16 @@ $importSettings = [
     'writerOptions' => [
       'civi_primary_entity' => 'CustomField',
       'file_path' => "$workroot/data/tempCF.csv",
+    ],
+  ],
+  'Campaigns' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/campaigns.csv",
+      'data_primary_key' => 'LGL Campaign ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Campaign',
+      'file_path' => "$workroot/data/tempCmp.csv",
     ],
   ],
   'Appeals' => [
