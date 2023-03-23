@@ -1,3 +1,2 @@
 /vendor
-server.prefs.php
-*settings.php
+*local.php
