@@ -50,4 +50,23 @@ class Cleanup {
     return $rows;
   }
 
+  /**
+   * Split a single 'Name' string into an array of substrings for different parts of a name.
+   */
+  public static function splitNames(array $rows, string $columnName) {
+    foreach ($rows as &$row) {
+      $separator = ' ';
+      $string = &$row[$columnName];
+      $names = explode($separator, $string);
+      $suffixes = ['Jr.']
+      if (count($names) === 2) {
+        $row['first_name'] = $names[0];
+        $row['last_name'] = $names[1];
+      }
+      else if (in_array($suffixes, $names)) {
+        $row['suffix'] = end($names);
+      }
+    }
+    return $rows;
+  }
 }
