@@ -186,6 +186,8 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'RelationshipType',
+      // This allows me to update existing records by matching on these fields.
+      'match_fields' => ['name_a_b', 'name_b_a'],
     ],
   ],
   'Relationships' => [
