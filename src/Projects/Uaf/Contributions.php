@@ -66,8 +66,8 @@ class Contributions {
 
     // Campaign
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
-    $rows = T\ValueTransforms::valueMapper($rows, 'campaign_external_identifier', ['0' => '']);
-    $rows = T\ValueTransforms::valueMapper($rows, 'appeal_external_identifier', ['0' => '']);
+    $rows = T\ValueTransforms::valueMapper($rows, 'campaign_external_identifier', ['0' => '', '497' => '']);
+    $rows = T\ValueTransforms::valueMapper($rows, 'appeal_external_identifier', ['0' => '', '2772' => '', '2662' => '']);
     // If the Contribution has an Appeal id, use that, if not, use the Campaign id if not null.
     $rows = T\Columns::coalesceColumns($rows, ['appeal_external_identifier', 'campaign_external_identifier'], 'campaign_or_appeal');
     // Look up and reutrn the id of the Campaign this Contribution is connected to.
