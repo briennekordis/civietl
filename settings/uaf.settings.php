@@ -90,27 +90,6 @@ $importSettings = [
       'civi_primary_entity' => 'GroupContact',
     ],
   ],
-  'ActivityTypes' => [
-    'readerOptions' => [
-      'file_path' => "$workroot/raw data/activityTypes.csv",
-      'data_primary_key' => '',
-    ],
-    'writerOptions' => [
-      'civi_primary_entity' => 'OptionValue',
-      'match_fields' => ['label'],
-    ],
-  ],
-  'Activities' => [
-    'readerOptions' => [
-      'file_path' => "$workroot/raw data/full_archive/tasks.csv",
-      'data_primary_key' => 'LGL Task ID',
-    ],
-    'writerOptions' => [
-      'civi_primary_entity' => 'Activity',
-      'file_path' => "$workroot/data/temp.csv",
-    ],
-    // 'writer_type' => 'CsvWriter',
-  ],
   'FinancialTypes' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/funds.csv",
@@ -210,6 +189,8 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'RelationshipType',
+      // This allows me to update existing records by matching on these fields.
+      'match_fields' => ['name_a_b', 'name_b_a'],
     ],
   ],
   'Relationships' => [
