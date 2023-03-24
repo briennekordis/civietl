@@ -149,6 +149,7 @@ $importSettings = [
     'writerOptions' => [
       'civi_primary_entity' => 'CustomGroup',
       'file_path' => "$workroot/data/tempCG.csv",
+      'match_fields' => ['name'],
     ],
   ],
   'CustomFields' => [
