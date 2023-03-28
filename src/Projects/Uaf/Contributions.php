@@ -37,7 +37,7 @@ class Contributions {
       'LGL Campaign ID' => 'campaign_external_identifier',
       'Fund' => 'financial_type_id:label',
       'LGL Appeal ID' => 'appeal_external_identifier',
-      // 'Gift Category',
+      'Gift Category' => 'Additional_Contribution_Data.Contribution_type:label',
       'Gift Amount' => 'total_amount',
       'Gift date' => 'receive_date',
       'Deposit Date' => 'Additional_Contribution_Data.Deposited_Date',
@@ -50,12 +50,17 @@ class Contributions {
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
     // $rows = T\RowFilters::randomSample($rows, 5);
+
     // Create any missing payment methods in the OptionValues table.
     $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
     T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
-    // Remap true to 1 and false to 0 for Anonymous_gift.
+
+    // Remap true to 1 and false to 0 for Anonymous gift.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['FALSE' => 0, 'TRUE' => 1]);
-    // $rows = T\ValueTransforms::toArray($rows, 'Additional_Contribution_Data.Anonymous_gift');
+
+    // Remap 'Donation' to 'Direct Donation' for Contribution type.
+    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
+
     // Add a column that gives these Contributions a 'Completed' status.
     $rows = T\Columns::newColumnWithConstant($rows, 'contribution_status_id:label', 'Completed');
 
