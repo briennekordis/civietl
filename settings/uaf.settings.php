@@ -22,10 +22,10 @@ $importSettings = [
       'civi_primary_entity' => 'Contact',
     ],
   ],
-  // 'StepTwo' => [
+  // 'ContactSplit' => [
   //   'readerOptions' => [
   //     // required for CsvReader: file_path, data_primary_key.
-  //     'file_path' => "$workroot/raw data/spouse_test.csv",
+  //     'file_path' => "$workroot/data/spouse_test.csv",
   //     'data_primary_key' => 'LGL Constituent ID',
   //   ],
   //   'writerOptions' => [
@@ -184,13 +184,14 @@ $importSettings = [
   ],
   'Contributions' => [
     'readerOptions' => [
-      'file_path' => "$workroot/raw data/full_archive/gift_gifts.csv",
+      'file_path' => "$workroot/data/contributionstest.csv",
       'data_primary_key' => 'LGL Gift ID',
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'Contribution',
       'file_path' => "$workroot/data/tempCon.csv",
     ],
+    // 'writer_type' => 'CsvWriter',
   ],
   'ContributionNotes' => [
     'readerOptions' => [
