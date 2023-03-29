@@ -2,6 +2,7 @@
 namespace Civietl\Transforms;
 
 use Civietl\Logging;
+use Civietl\Maps;
 
 class Cleanup {
 
@@ -58,13 +59,20 @@ class Cleanup {
       $separator = ' ';
       $string = &$row[$columnName];
       $names = explode($separator, $string);
-      $suffixes = ['Jr.'];
+      $suffixes = \Civietl\Maps::SUFFIX_MAP;
       if (count($names) === 2) {
         $row['first_name'] = $names[0];
         $row['last_name'] = $names[1];
       }
       elseif (in_array($suffixes, $names)) {
+        $row['first_name'] = $names[0];
+        $row['last_name'] = $names[1];
         $row['suffix'] = end($names);
+      }
+      elseif ((count($names) === 3) && !(in_array($suffixes, $names))) {
+        $row['first_name'] = $names[0];
+        $row['middle_name'] = $names[1];
+        $row['last_name'] = $names[2];
       }
     }
     return $rows;
