@@ -24,12 +24,10 @@ $importSettings = [
   ],
   // 'ContactSplit' => [
   //   'readerOptions' => [
-  //     // required for CsvReader: file_path, data_primary_key.
   //     'file_path' => "$workroot/data/spouse_test.csv",
   //     'data_primary_key' => 'LGL Constituent ID',
   //   ],
   //   'writerOptions' => [
-  //     // required for CsvWriter/JsonWriter: file_path.
   //     'file_path' => "$workroot/data/contacts2.csv",
   //     // required for CiviCrmApi4: civi_primary_entity.
   //     'civi_primary_entity' => 'Contact',
@@ -52,6 +50,16 @@ $importSettings = [
     ],
     'writerOptions' => [
       'file_path' => "$workroot/data/tempGM.csv",
+      'civi_primary_entity' => 'Contact',
+    ],
+  ],
+  'CommunicationPreferences' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/constituents.csv",
+      'data_primary_key' => 'LGL Constituent ID',
+    ],
+    'writerOptions' => [
+      'file_path' => "$workroot/data/contacts.csv",
       'civi_primary_entity' => 'Contact',
     ],
   ],
