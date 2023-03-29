@@ -58,7 +58,7 @@ class Contributions {
     // Remap 'Donation' to 'Direct Donation' for Contribution type.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
     // Get the value needed for 'non_deductible_amount' from 'Deductible amount'.
-    $rows = array_walk($rows, function(&$row) {
+    array_walk($rows, function(&$row) {
       $row['non_deductible_amount'] = $row['total_amount'] - $row['Deductible amount'];
     });
 
