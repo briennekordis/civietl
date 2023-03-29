@@ -72,6 +72,17 @@ $importSettings = [
       'civi_primary_entity' => 'Phone',
     ],
   ],
+  'Addresses' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/street_addresses.csv",
+      'data_primary_key' => 'LGL Address ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Address',
+      'file_path' => "$workroot/data/addresses.csv",
+    ],
+    'writer_type' => 'CsvWriter',
+  ],
   'Notes' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/notes.csv",
