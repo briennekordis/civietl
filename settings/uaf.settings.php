@@ -184,14 +184,13 @@ $importSettings = [
   ],
   'Contributions' => [
     'readerOptions' => [
-      'file_path' => "$workroot/data/contributionstest.csv",
+      'file_path' => "$workroot/raw data/full_archive/gift_gifts.csv",
       'data_primary_key' => 'LGL Gift ID',
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'Contribution',
       'file_path' => "$workroot/data/tempCon.csv",
     ],
-    // 'writer_type' => 'CsvWriter',
   ],
   'ContributionNotes' => [
     'readerOptions' => [
