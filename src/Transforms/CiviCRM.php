@@ -60,15 +60,22 @@ class CiviCRM {
   public static function lookup(array $rows, string $entity, string $columnName, string $lookupField, array $returnFields) : array {
     // Get all the lookup data in one query, much faster than one query per row.
     $result = (array) civicrm_api4($entity, 'get', [
-      'select' => [$lookupField] + $returnFields,
+      'select' => array_merge([$lookupField], $returnFields),
       'where' => [[$lookupField, 'IS NOT NULL']],
       'checkPermissions' => FALSE,
     ]);
     // Reindex the cache data for easiest lookup speed.
     $lookupData = array_combine(array_column($result, $lookupField), $result);
     // We needed the lookupField in the original result, but drop it if we're not supposed to return it, otherwise we'll duplicate that field.
+    $columnsToDelete = [];
     if (!in_array($lookupField, $returnFields)) {
-      $lookupData = Columns::deleteColumns($lookupData, [$lookupField]);
+      $columnsToDelete[] = $lookupField;
+    }
+    if (!in_array('id', $returnFields)) {
+      $columnsToDelete[] = 'id';
+    }
+    if ($columnsToDelete) {
+      $lookupData = Columns::deleteColumns($lookupData, $columnsToDelete);
     }
     // For when the lookup value is blank.
     $blankLookup = array_fill_keys($returnFields, '');
