@@ -35,6 +35,16 @@ $importSettings = [
   //     'civi_primary_entity' => 'Contact',
   //   ],
   // ],
+  'GrantMakers' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/grant_making_institutions.csv",
+      'data_primary_key' => 'external_identifier',
+    ],
+    'writerOptions' => [
+      'file_path' => "$workroot/data/tempGM.csv",
+      'civi_primary_entity' => 'Contact',
+    ],
+  ],
   'ContactSubtypes' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/contact_subtypes.csv",
