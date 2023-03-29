@@ -45,7 +45,7 @@ class Contributions {
       'Vehicle Name' => 'vehicle_name',
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
-    $rows = T\RowFilters::randomSample($rows, 50);
+    // $rows = T\RowFilters::randomSample($rows, 50);
 
     // Cleanup
     // Create any missing payment methods in the OptionValues table.
@@ -57,6 +57,8 @@ class Contributions {
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['FALSE' => 0, 'TRUE' => 1]);
     // Remap 'Donation' to 'Direct Donation' for Contribution type.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
+    // Remap (i.e. clean up) Vehcile Name.
+    $rows = T\ValueTransforms::valueMapper($rows, 'vehicle_name', ['2022-10-24 16:00:56 UTC' => 'Shell Oil Company Foundation']);
     // Get the value needed for 'non_deductible_amount' from 'Deductible amount'.
     array_walk($rows, function(&$row) {
       $row['non_deductible_amount'] = $row['total_amount'] - $row['Deductible amount'];
