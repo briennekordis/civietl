@@ -38,17 +38,16 @@ class Contributions {
       'Gift Category' => 'Additional_Contribution_Data.Contribution_type:label',
       'Gift Amount' => 'total_amount',
       'Gift date' => 'receive_date',
-      'Deductible amount' => 'non_deductible_amount',
       'Deposit Date' => 'Additional_Contribution_Data.Deposited_Date',
       'Payment type' => 'payment_instrument_id:label',
       'Check/Reference No.' => 'check_number',
       'Anonymous gift?' => 'Additional_Contribution_Data.Anonymous_gift',
-      'Vehicle Name' => 'vehicle_external_identifier',
+      'Vehicle Name' => 'vehicle_name',
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
     // $rows = T\RowFilters::randomSample($rows, 5);
 
-    //Cleanup
+    // Cleanup
     // Create any missing payment methods in the OptionValues table.
     $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
     T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
@@ -58,15 +57,19 @@ class Contributions {
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['FALSE' => 0, 'TRUE' => 1]);
     // Remap 'Donation' to 'Direct Donation' for Contribution type.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
-   
-    //Contants
-    // Look up and reutrn the id of the Contact this Contribution is connected to.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'contact_external_identifier', 'external_identifier', ['id']);
-    $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
-    // Vehicle (aka Contact of type: Grant Making Institution)
-    // $rows = T\CiviCRM::lookup($rows, '', 'vehicle_external_identifier', 'external_identifier', ['id']);
+    // Get the value needed for 'non_deductible_amount' from 'Deductible amount'.
+    $rows = array_walk($rows, function(&$row) {
+      $row['non_deductible_amount'] = $row['total_amount'] - $row['Deductible amount'];
+    });
 
-    //Campaigns
+    // Contacts
+    // If the Contribution has a Vehicle Name, use that, if not, use the LGL Constituent ID.
+    $rows = T\Columns::coalesceColumns($rows, ['vehicle_name', 'contact_external_identifier'], 'constituent_or_vehicle');
+    // Look up and reutrn the id of the Contact this Contribution is connected to.
+    $rows = T\CiviCRM::lookup($rows, 'Contact', 'constituent_or_vehicle', 'external_identifier', ['id']);
+    $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
+
+    // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
     $rows = T\ValueTransforms::valueMapper($rows, 'campaign_external_identifier', ['0' => '', '497' => '']);
     $rows = T\ValueTransforms::valueMapper($rows, 'appeal_external_identifier', ['0' => '', '2772' => '', '2662' => '']);
