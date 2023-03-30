@@ -45,7 +45,7 @@ class Contributions {
       'Vehicle Name' => 'vehicle_name',
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
-    // $rows = T\RowFilters::randomSample($rows, 5);
+    // $rows = T\RowFilters::randomSample($rows, 50);
 
     // Cleanup
     // Create any missing payment methods in the OptionValues table.
@@ -57,17 +57,30 @@ class Contributions {
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['FALSE' => 0, 'TRUE' => 1]);
     // Remap 'Donation' to 'Direct Donation' for Contribution type.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
+    // Remap (i.e. clean up) Vehcile Name.
+    $rows = T\ValueTransforms::valueMapper($rows, 'vehicle_name', ['2022-10-24 16:00:56 UTC' => 'Shell Oil Company Foundation']);
     // Get the value needed for 'non_deductible_amount' from 'Deductible amount'.
     array_walk($rows, function(&$row) {
       $row['non_deductible_amount'] = $row['total_amount'] - $row['Deductible amount'];
     });
 
     // Contacts
-    // If the Contribution has a Vehicle Name, use that, if not, use the LGL Constituent ID.
-    $rows = T\Columns::coalesceColumns($rows, ['vehicle_name', 'contact_external_identifier'], 'constituent_or_vehicle');
-    // Look up and reutrn the id of the Contact this Contribution is connected to.
+    // Look up and return the external_identifier of the Vehicle.
+    $rows = T\CiviCRM::lookup($rows, 'Contact', 'vehicle_name', 'organization_name', ['external_identifier']);
+    $rows = T\Columns::renameColumns($rows, ['external_identifier' => 'vehicle_external_identifier']);
+    // If the Contribution has a Vehicle, use that, if not, use the LGL Constituent ID.
+    $rows = T\Columns::coalesceColumns($rows, ['vehicle_external_identifier', 'contact_external_identifier'], 'constituent_or_vehicle');
+    // Look up and return the id of the Contact this Contribution is connected to.
     $rows = T\CiviCRM::lookup($rows, 'Contact', 'constituent_or_vehicle', 'external_identifier', ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
+    // Split rows into those with vehicles and those without
+    $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_name');
+    $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
+    // Assign a Donor Advisor for Contributions with a Vehicle.
+    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', 'contact_external_identifier', 'external_identifier', ['id']);
+    $rowsWithVehicle = T\Columns::renameColumns($rowsWithVehicle, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
+    // Merge the two types of rows back into one.
+    $rows = $rowsWithVehicle + $rowsWithNoVehicle;
 
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
@@ -75,7 +88,7 @@ class Contributions {
     $rows = T\ValueTransforms::valueMapper($rows, 'appeal_external_identifier', ['0' => '', '2772' => '', '2662' => '']);
     // If the Contribution has an Appeal id, use that, if not, use the Campaign id if not null.
     $rows = T\Columns::coalesceColumns($rows, ['appeal_external_identifier', 'campaign_external_identifier'], 'campaign_or_appeal');
-    // Look up and reutrn the id of the Campaign this Contribution is connected to.
+    // Look up and return the id of the Campaign this Contribution is connected to.
     $rows = T\CiviCRM::lookup($rows, 'Campaign', 'campaign_or_appeal', 'external_identifier', ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'campaign_id']);
 

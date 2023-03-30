@@ -31,7 +31,6 @@ class StepOne {
     // INDIVIDUALS
     // Clean up prefix IDs.
     $rowsIndividual = T\ValueTransforms::valueMapper($rowsIndividual, 'prefix_id:label', \Civietl\Maps::PREFIX_MAP);
-    $rowsIndividual = T\Columns::newColumnWithConstant($rowsIndividual, 'last_name', '');
     // Create any missing prefixes in the option values table.
     $prefixes = T\RowFilters::getUniqueValues($rows, 'prefix_id:label');
     T\CiviCRM::createOptionValues('individual_prefix', $prefixes);

@@ -22,19 +22,27 @@ $importSettings = [
       'civi_primary_entity' => 'Contact',
     ],
   ],
-  // 'StepTwo' => [
+  // 'ContactSplit' => [
   //   'readerOptions' => [
-  //     // required for CsvReader: file_path, data_primary_key.
-  //     'file_path' => "$workroot/raw data/spouse_test.csv",
+  //     'file_path' => "$workroot/data/spouse_test.csv",
   //     'data_primary_key' => 'LGL Constituent ID',
   //   ],
   //   'writerOptions' => [
-  //     // required for CsvWriter/JsonWriter: file_path.
   //     'file_path' => "$workroot/data/contacts2.csv",
   //     // required for CiviCrmApi4: civi_primary_entity.
   //     'civi_primary_entity' => 'Contact',
   //   ],
   // ],
+  'ContactSubtypes' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/contact_subtypes.csv",
+      'data_primary_key' => 'Contact Type ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'ContactType',
+      'file_path' => "$workroot/data/tempCT.csv",
+    ],
+  ],
   'GrantMakers' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/grant_making_institutions.csv",
@@ -45,14 +53,14 @@ $importSettings = [
       'civi_primary_entity' => 'Contact',
     ],
   ],
-  'ContactSubtypes' => [
+  'CommunicationPreferences' => [
     'readerOptions' => [
-      'file_path' => "$workroot/raw data/contact_subtypes.csv",
-      'data_primary_key' => 'Contact Type ID',
+      'file_path' => "$workroot/raw data/full_archive/constituents.csv",
+      'data_primary_key' => 'LGL Constituent ID',
     ],
     'writerOptions' => [
-      'civi_primary_entity' => 'ContactType',
-      'file_path' => "$workroot/data/tempCT.csv",
+      'file_path' => "$workroot/data/contacts.csv",
+      'civi_primary_entity' => 'Contact',
     ],
   ],
   'Websites' => [

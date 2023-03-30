@@ -3,7 +3,7 @@ namespace Civietl\Projects\Uaf;
 
 use Civietl\Transforms as T;
 
-class StepTwo {
+class ContactSplit {
 
   /**
    * Do all the transforms associated with this step.
@@ -18,10 +18,10 @@ class StepTwo {
     $rows = T\Columns::renameColumns($rows, [
       'LGL Constituent ID' => 'external_identifier',
     ]);
-    // Split Spouses into separate contact records.
+    // Split contacts into separate Dontact records.
     $rows = T\Cleanup::splitContacts($rows, 'external_identifier');
     // Split the Spouse Name into separate strings.
-    $rows = T\Text::stringSplit($rows, 'Spouse Name');
+    $rows = T\Cleanup::splitNames($rows, 'Spouse Name');
     // For testing - just show 5 rows.
     // $rows = T\RowFilters::randomSample($rows, 5);
     return $rows;
