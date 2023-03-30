@@ -26,7 +26,7 @@ class Emails {
     // Create any missing website types in the option values table.
     $locationTypes = T\RowFilters::getUniqueValues($rows, 'location_type_id:label');
     T\CiviCRM::createLocationTypes($locationTypes);
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'external_identifier', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['external_identifier' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
     return $rows;
   }

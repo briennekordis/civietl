@@ -65,18 +65,18 @@ class Contributions {
 
     // Contacts
     // Look up and return the external_identifier of the Vehicle.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'vehicle_name', 'organization_name', ['external_identifier']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['vehicle_name' => 'organization_name'], ['external_identifier']);
     $rows = T\Columns::renameColumns($rows, ['external_identifier' => 'vehicle_external_identifier']);
     // If the Contribution has a Vehicle, use that, if not, use the LGL Constituent ID.
     $rows = T\Columns::coalesceColumns($rows, ['vehicle_external_identifier', 'contact_external_identifier'], 'constituent_or_vehicle');
     // Look up and return the id of the Contact this Contribution is connected to.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'constituent_or_vehicle', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['constituent_or_vehicle' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
     // Split rows into those with vehicles and those without
     $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_name');
     $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
     // Assign a Donor Advisor for Contributions with a Vehicle.
-    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', 'contact_external_identifier', 'external_identifier', ['id']);
+    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
     $rowsWithVehicle = T\Columns::renameColumns($rowsWithVehicle, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
     // Merge the two types of rows back into one.
     $rows = $rowsWithVehicle + $rowsWithNoVehicle;
@@ -88,7 +88,7 @@ class Contributions {
     // If the Contribution has an Appeal id, use that, if not, use the Campaign id if not null.
     $rows = T\Columns::coalesceColumns($rows, ['appeal_external_identifier', 'campaign_external_identifier'], 'campaign_or_appeal');
     // Look up and return the id of the Campaign this Contribution is connected to.
-    $rows = T\CiviCRM::lookup($rows, 'Campaign', 'campaign_or_appeal', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Campaign', ['campaign_or_appeal', 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'campaign_id']);
 
     return $rows;

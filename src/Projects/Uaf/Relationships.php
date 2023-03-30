@@ -15,17 +15,17 @@ class Relationships {
       'Relationship Type',
     ]);
     // Get contact ID A.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'LGL Constituent ID', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id_a']);
     // Get contact ID B.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'Related LGL Constituent ID', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['Related LGL Constituent ID' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id_b']);
     // Clean up the relationships.
     $rows = T\ValueTransforms::valueMapper($rows, 'Relationship Type', self::RELATIONSHIP_ACTIVE_MAP, 'is_active');
     $rows = T\ValueTransforms::valueMapper($rows, 'Relationship Type', self::RELATIONSHIP_DESCRIPTION_MAP, 'description');
     $rows = T\ValueTransforms::valueMapper($rows, 'Relationship Type', self::RELATIONSHIP_TYPE_MAP);
     // Get relationship type IDs.
-    $rows = T\CiviCRM::lookup($rows, 'RelationshipType', 'Relationship Type', 'name_a_b', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'RelationshipType', ['Relationship Type' => 'name_a_b'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'relationship_type_id']);
     return $rows;
   }

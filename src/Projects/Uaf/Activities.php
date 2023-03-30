@@ -26,10 +26,10 @@ class Activities {
     ]);
 
     // Get target contact IDs.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'LGL Constituent ID', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'target_contact_id']);
     // Get assignee contact IDs.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'Task owner', 'display_name', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['Task owner' => 'display_name'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'assignee_contact_id']);
     // We need a source_contact_id, use target_contact_id.
     $rows = T\Columns::copyColumn($rows, 'target_contact_id', 'source_contact_id');
