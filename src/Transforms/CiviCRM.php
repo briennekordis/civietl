@@ -59,7 +59,7 @@ class CiviCRM {
    * Return one or more fields from a record based on an existing value(s).
    * E.g. from external_identifier, return the contact_id.
    */
-  public static function lookup(array $rows, string $entity, string $columnName, array $lookupFields, array $returnFields, string $defaultValue = '') : array {
+  public static function lookup(array $rows, string $entity, array $lookupFields, array $returnFields, string $defaultValue = '') : array {
     // Get all the lookup data in one query, much faster than one query per row.
     foreach ($lookupFields as $lookupField) {
       $where[] = [$lookupField, 'IS NOT NULL'];
@@ -71,14 +71,17 @@ class CiviCRM {
     ]);
     // Reindex the cache data for easiest lookup speed.
     $lookupKeys = array_column($result, implode("\x01", $lookupFields));
+    // Uppercase for case-insensitive comparison.
     array_walk($lookupKeys, function(&$lookupKey) {
       $lookupKey = strtoupper($lookupKey);
     });
     $lookupData = array_combine($lookupKeys, $result);
     // We needed the lookupField in the original result, but drop it if we're not supposed to return it, otherwise we'll duplicate that field.
     $columnsToDelete = [];
-    if (!in_array($lookupField, $returnFields)) {
-      $columnsToDelete[] = $lookupField;
+    foreach ($lookupFields as $lookupField) {
+      if (!in_array($lookupField, $returnFields)) {
+        $columnsToDelete[] = $lookupField;
+      }
     }
     if (!in_array('id', $returnFields)) {
       $columnsToDelete[] = 'id';
@@ -90,7 +93,12 @@ class CiviCRM {
     $blankLookup = array_fill_keys($returnFields, $defaultValue);
 
     foreach ($rows as &$row) {
-      if ($row[$columnName]) {
+      // If we don't have values for all columns, don't do a lookup, assign the default value.
+      $match = TRUE;
+      foreach ($lookupFields as $columnName => $lookupField) {
+        $match = $match && (bool) $row[$columnName];
+      }
+      if ($match) {
         if (!$lookupData[strtoupper($row[$columnName])]) {
           Logging::log("Invalid $columnName lookup: $row[$columnName] . Row: " . implode(', ', $row));
         }

@@ -23,7 +23,7 @@ class ContributionNotes {
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
     $rows = T\RowFilters::randomSample($rows, 5);
-    // $rows = T\CiviCRM::lookup($rows, 'Contribution', 'external_identifier', 'external_identifier', ['id']);
+    // $rows = T\CiviCRM::lookup($rows, 'Contact', ['external_identifier' => 'external_identifier'], ['id']);
     // $rows = T\Columns::renameColumns($rows, ['id' => 'entity_id']);
     $rows = T\Columns::newColumnWithConstant($rows, 'entity_table', 'civicrm_contribution');
     $rows = T\Columns::copyColumn($rows, 'note_date', 'modified_date');

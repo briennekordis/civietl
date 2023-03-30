@@ -7,7 +7,7 @@ class Addresses {
 
   public function transforms(array $rows) : array {
     // Get Contact ID.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'LGL Constituent ID', ['external_identifier'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, [
       'id' => 'contact_id',
       'Address Type' => 'location_type_id:label',
@@ -35,14 +35,16 @@ class Addresses {
     $rowsWithISOCode = array_filter($rows, function($row) {
       return strlen($row['Country']) === 2;
     });
-    $rowsWithISOCode = T\CiviCRM::lookup($rowsWithISOCode, 'Country', 'Country', ['iso_code'], ['id']);
+    $rowsWithISOCode = T\CiviCRM::lookup($rowsWithISOCode, 'Country', ['Country' => 'iso_code'], ['id']);
 
     $rowsWithName = array_diff_key($rows, $rowsWithISOCode);
-    $rowsWithName = T\CiviCRM::lookup($rowsWithName, 'Country', 'Country', ['name'], ['id']);
+    $rowsWithName = T\CiviCRM::lookup($rowsWithName, 'Country', ['Country' => 'name'], ['id'], '1228');
     // rejoin the rows.
     $rows = $rowsWithISOCode + $rowsWithName;
     $rows = T\Columns::renameColumns($rows, ['id' => 'country_id']);
 
+    // Lookup state_province by abbreviation.
+    // $rows = T\CiviCRM::lookup()
     return $rows;
   }
 

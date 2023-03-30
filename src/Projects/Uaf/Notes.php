@@ -17,7 +17,7 @@ class Notes {
       'Note Text' => 'note',
       'Note Date' => 'note_date',
     ]);
-    $rows = T\CiviCRM::lookup($rows, 'Contact', 'external_identifier', 'external_identifier', ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['external_identifier' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'entity_id']);
     $rows = T\Columns::newColumnWithConstant($rows, 'entity_table', 'civicrm_contact');
     $rows = T\Columns::copyColumn($rows, 'note_date', 'modified_date');
