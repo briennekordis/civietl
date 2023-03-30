@@ -74,21 +74,21 @@ class CiviCRM {
         $match = $match && (bool) $row[$columnName];
         $compositeRowKey[] = $row[$columnName];
       }
-      $compositeRowKey = strtoupper(implode("\x01", $compositeRowKey));
+      $compositeRowKey = implode("\x01", $compositeRowKey);
+      $ucCompositeRowKey = strtoupper($compositeRowKey);
       if ($match) {
-        if ($logErrors && !isset($lookupData[$compositeRowKey])) {
+        if ($logErrors && !isset($lookupData[$ucCompositeRowKey])) {
           if (!$logHeadersWritten) {
             $logHeadersWritten = TRUE;
             $csv = Logging::arrayToCsv(array_keys($row));
             $logger->log('New Headers, ' . $csv);
           }
           $csv = Logging::arrayToCsv($row);
-          // This probably shouldn't be $row[$columnName] when we haev a composite key.
-          $logger->log("Invalid $compositeRowKey lookup: $row[$columnName] . Row:, " . $csv);
+          $logger->log("Invalid $compositeRowKey lookup failed on: $columnName, " . $csv);
         }
       }
       // Create the new columns even if we don't fill them.
-      $row += $lookupData[$compositeRowKey] ?? $noLookupColumns;
+      $row += $lookupData[$ucCompositeRowKey] ?? $noLookupColumns;
     }
 
     // Delete new columns that aren't in the $returnFields.
