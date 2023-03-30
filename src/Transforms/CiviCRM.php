@@ -102,7 +102,7 @@ class CiviCRM {
       $columnsToDelete[] = 'id';
     }
     if ($columnsToDelete) {
-      $lookupData = Columns::deleteColumns($lookupData, $columnsToDelete);
+      $rows = Columns::deleteColumns($rows, $columnsToDelete);
     }
 
     return $rows;
