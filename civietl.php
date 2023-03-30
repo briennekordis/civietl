@@ -9,9 +9,9 @@ use Civietl\Reader\ReaderService;
 use Civietl\Writer\WriterService;
 use Civietl\Utils as U;
 
+$GLOBALS['newEtlStarted'] = TRUE;
 $cliArguments = U::parseCli();
 require_once $cliArguments['settings-file'];
-Logging::setLogFolder($logFolder);
 // Perform CiviCRM bootstrap
 // phpcs:ignore
 eval(`cv --cwd=$webroot php:boot`);
