@@ -22,17 +22,17 @@ $importSettings = [
       'civi_primary_entity' => 'Contact',
     ],
   ],
-  // 'ContactSplit' => [
-  //   'readerOptions' => [
-  //     'file_path' => "$workroot/data/spouse_test.csv",
-  //     'data_primary_key' => 'LGL Constituent ID',
-  //   ],
-  //   'writerOptions' => [
-  //     'file_path' => "$workroot/data/contacts2.csv",
-  //     // required for CiviCrmApi4: civi_primary_entity.
-  //     'civi_primary_entity' => 'Contact',
-  //   ],
-  // ],
+  'ContactSplit' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/data/spouse_test.csv",
+      'data_primary_key' => 'LGL Constituent ID',
+    ],
+    'writerOptions' => [
+      'file_path' => "$workroot/data/contacts2.csv",
+      // required for CiviCrmApi4: civi_primary_entity.
+      'civi_primary_entity' => 'Contact',
+    ],
+  ],
   'ContactSubtypes' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/contact_subtypes.csv",

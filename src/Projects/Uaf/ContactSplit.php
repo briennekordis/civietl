@@ -17,9 +17,14 @@ class ContactSplit {
     // Rename some columns that are one-to-one with Civi.
     $rows = T\Columns::renameColumns($rows, [
       'LGL Constituent ID' => 'external_identifier',
+      'Spouse Nick Name' => 'nick_name',
     ]);
-    // Split contacts into separate Dontact records.
+    // Split contacts into separate Contact records.
     $rows = T\Cleanup::splitContacts($rows, 'external_identifier');
+    $rows = T\Columns::deleteColumns($rows, ['external_identifier']);
+    $rows = T\Columns::renameColumns($rows, [
+      'spouseExID' => 'external_identifier',
+    ]);
     // Split the Spouse Name into separate strings.
     $rows = T\Cleanup::splitNames($rows, 'Spouse Name');
     // For testing - just show 5 rows.
