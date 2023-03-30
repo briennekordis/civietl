@@ -1,6 +1,8 @@
 <?php
 namespace Civietl\Transforms;
 
+use Civietl\Logging;
+
 class CiviCRM {
 
   /**
@@ -54,18 +56,25 @@ class CiviCRM {
   }
 
   /**
-   * Return one or more fields from a record based on an existing value.
+   * Return one or more fields from a record based on an existing value(s).
    * E.g. from external_identifier, return the contact_id.
    */
-  public static function lookup(array $rows, string $entity, string $columnName, string $lookupField, array $returnFields) : array {
+  public static function lookup(array $rows, string $entity, string $columnName, array $lookupFields, array $returnFields) : array {
     // Get all the lookup data in one query, much faster than one query per row.
+    foreach ($lookupFields as $lookupField) {
+      $where[] = [$lookupField, 'IS NOT NULL'];
+    }
     $result = (array) civicrm_api4($entity, 'get', [
-      'select' => [$lookupField] + $returnFields,
-      'where' => [[$lookupField, 'IS NOT NULL']],
+      'select' => array_merge($lookupFields, $returnFields),
+      'where' => $where,
       'checkPermissions' => FALSE,
     ]);
     // Reindex the cache data for easiest lookup speed.
-    $lookupData = array_combine(array_column($result, $lookupField), $result);
+    $lookupKeys = array_column($result, implode("\x01", $lookupFields));
+    array_walk($lookupKeys, function(&$lookupKey) {
+      $lookupKey = strtoupper($lookupKey);
+    });
+    $lookupData = array_combine($lookupKeys, $result);
     // We needed the lookupField in the original result, but drop it if we're not supposed to return it, otherwise we'll duplicate that field.
     if (!in_array($lookupField, $returnFields)) {
       $lookupData = Columns::deleteColumns($lookupData, [$lookupField]);
@@ -75,7 +84,10 @@ class CiviCRM {
 
     foreach ($rows as &$row) {
       if ($row[$columnName]) {
-        $row += $lookupData[$row[$columnName]];
+        if (!$lookupData[strtoupper($row[$columnName])]) {
+          Logging::log("Invalid $columnName lookup: $row[$columnName] . Row: " . implode(', ', $row));
+        }
+        $row += $lookupData[strtoupper($row[$columnName])] ?? [];
       }
       else {
         $row += $blankLookup;
