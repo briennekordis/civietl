@@ -36,7 +36,6 @@ class Addresses {
       return strlen($row['Country']) === 2;
     });
     $rowsWithISOCode = T\CiviCRM::lookup($rowsWithISOCode, 'Country', ['Country' => 'iso_code'], ['id'], FALSE);
-    $rowsWithISOCode = T\Columns::deleteColumns($rowsWithISOCode, ['iso_code']);
     $rowsWithCountryName = array_diff_key($rows, $rowsWithISOCode);
     $rowsWithCountryName = T\CiviCRM::lookup($rowsWithCountryName, 'Country', ['Country' => 'name'], ['id'], FALSE);
     // rejoin the rows.
