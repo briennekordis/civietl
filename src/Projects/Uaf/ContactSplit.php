@@ -24,9 +24,7 @@ class ContactSplit {
     // Split contacts into separate Contact records.
     $rows = T\Cleanup::splitContacts($rows, 'external_identifier');
     $rows = T\Columns::deleteColumns($rows, ['external_identifier']);
-    $rows = T\Columns::renameColumns($rows, [
-      'spouseExID' => 'external_identifier',
-    ]);
+    $rows = T\Columns::renameColumns($rows, ['spouseExID' => 'external_identifier']);
     // Split the Spouse Name into separate strings.
     $rows = T\Cleanup::splitNames($rows, 'Spouse Name');
     //Split rows into those with last names and those without

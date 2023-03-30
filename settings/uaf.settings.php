@@ -230,4 +230,14 @@ $importSettings = [
       'civi_primary_entity' => 'Relationship',
     ],
   ],
+  'SplitContactsRelationships' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/contact_split_relationships.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Relationship',
+    ],
+  ],
+
 ];
