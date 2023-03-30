@@ -240,5 +240,13 @@ $importSettings = [
       'civi_primary_entity' => 'Relationship',
     ],
   ],
-
+  'MemberRelationships' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/memberships.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Relationship',
+    ],
+  ],
 ];
