@@ -8,11 +8,7 @@ class Columns {
    *   array in format `['oldname1' => 'newname1', 'oldname2' => 'newname2', etc.]`
    */
   public static function renameColumns(array $rows, array $columnsToRename) : array {
-    // Ensure all the columns to rename exist.
-    $missingColumns = array_diff(array_keys($columnsToRename), array_keys(reset($rows)));
-    if ($missingColumns) {
-      throw new \Exception('Error in ' . __FUNCTION__ . ': These columns don\'t exist in the data: ' . implode(', ', $missingColumns));
-    }
+    self::columnsPresent($rows, array_keys($columnsToRename), __FUNCTION__);
     foreach ($rows as &$row) {
       foreach ($columnsToRename as $oldName => $newName) {
         $row[$newName] = $row[$oldName];
@@ -23,6 +19,7 @@ class Columns {
   }
 
   public static function deleteColumns(array $rows, array $columnsToDelete) : array {
+    self::columnsPresent($rows, $columnsToDelete, __FUNCTION__);
     foreach ($rows as &$row) {
       foreach ($row as $columnName => $dontcare) {
         if (in_array($columnName, $columnsToDelete)) {
@@ -34,6 +31,7 @@ class Columns {
   }
 
   public static function deleteAllColumnsExcept(array $rows, array $columnsToKeep) : array {
+    self::columnsPresent($rows, $columnsToKeep, __FUNCTION__);
     foreach ($rows as &$row) {
       foreach ($row as $columnName => $dontcare) {
         if (!in_array($columnName, $columnsToKeep)) {
@@ -44,7 +42,9 @@ class Columns {
     return $rows;
   }
 
-  // Can also be used to overwrite an existing row's values.
+  /**
+   * Can also be used to overwrite an existing row's values.
+   */
   public static function newColumnWithConstant(array $rows, string $newColumnName, mixed $constant) : array {
     foreach ($rows as &$row) {
       $row[$newColumnName] = $constant;
@@ -53,6 +53,7 @@ class Columns {
   }
 
   public static function copyColumn(array $rows, string $oldColumnName, string $newColumnName) : array {
+    self::columnsPresent($rows, [$oldColumnName], __FUNCTION__);
     foreach ($rows as &$row) {
       $row[$newColumnName] = $row[$oldColumnName];
     }
@@ -63,6 +64,7 @@ class Columns {
    * Note that when called, the $columnNames should be passed in order of preference as to which value should be selected if both/all columns have a value.
    */
   public static function coalesceColumns(array $rows, array $columnNames, string $outputColumn) {
+    self::columnsPresent($rows, $columnNames, __FUNCTION__);
     foreach ($rows as &$row) {
       $row[$outputColumn] = NULL;
       foreach ($columnNames as $column => $dontcare) {
@@ -74,6 +76,16 @@ class Columns {
       }
     }
     return $rows;
+  }
+
+  /**
+   * Ensure all the columns we're operating on exist.
+   */
+  private static function columnsPresent(array $rows, array $columns, string $functionName) {
+    $missingColumns = array_diff($columns, array_keys(reset($rows)));
+    if ($missingColumns) {
+      throw new \Exception("Error in $functionName: These columns don\'t exist in the data: " . implode(', ', $missingColumns));
+    }
   }
 
 }
