@@ -60,7 +60,10 @@ class Cleanup {
       $string = &$row[$columnName];
       $names = explode($separator, $string);
       $suffixes = \Civietl\Maps::SUFFIX_MAP;
-      if (count($names) === 2) {
+      if (count($names) === 1) {
+        $row['first_name'] = $names[0];
+      }
+      elseif (count($names) === 2) {
         $row['first_name'] = $names[0];
         $row['last_name'] = $names[1];
       }
@@ -74,6 +77,16 @@ class Cleanup {
         $row['middle_name'] = $names[1];
         $row['last_name'] = $names[2];
       }
+    }
+    return $rows;
+  }
+
+  public static function getLastName(array $rows, string $columnName) {
+    foreach ($rows as &$row) {
+      $separator = ' ';
+      $string = &$row[$columnName];
+      $names = explode($separator, $string);
+      $row['last_name'] = end($names);
     }
     return $rows;
   }
