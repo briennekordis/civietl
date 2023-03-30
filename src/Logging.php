@@ -15,7 +15,7 @@ class Logging {
     }
     $this->logger = new Logger($channel);
     $stream = new StreamHandler($GLOBALS['logFolder'] . "/$channel.csv", Logger::INFO);
-    $formatter = new LineFormatter("[%datetime%], %channel%, %level_name%, %message%\n");
+    $formatter = new LineFormatter("%channel%, %message%\n");
     $stream->setFormatter($formatter);
     $this->logger->pushHandler($stream);
   }
@@ -30,8 +30,8 @@ class Logging {
       die;
     }
     $files = glob($GLOBALS['logFolder'] . '/*.csv');
-    foreach($files as $file){
-      if(is_file($file)) {
+    foreach ($files as $file) {
+      if (is_file($file)) {
         unlink($file);
       }
     }
