@@ -81,7 +81,7 @@ class Columns {
   /**
    * Ensure all the columns we're operating on exist.
    */
-  private static function columnsPresent(array $rows, array $columns, string $functionName) {
+  public static function columnsPresent(array $rows, array $columns, string $functionName) {
     $missingColumns = array_diff($columns, array_keys(reset($rows)));
     if ($missingColumns) {
       throw new \Exception("Error in $functionName: These columns don\'t exist in the data: " . implode(', ', $missingColumns));
