@@ -59,7 +59,7 @@ class CiviCRM {
    * Return one or more fields from a record based on an existing value(s).
    * E.g. from external_identifier, return the contact_id.
    */
-  public static function lookup(array $rows, string $entity, string $columnName, array $lookupFields, array $returnFields) : array {
+  public static function lookup(array $rows, string $entity, string $columnName, array $lookupFields, array $returnFields, string $defaultValue = '') : array {
     // Get all the lookup data in one query, much faster than one query per row.
     foreach ($lookupFields as $lookupField) {
       $where[] = [$lookupField, 'IS NOT NULL'];
@@ -76,11 +76,18 @@ class CiviCRM {
     });
     $lookupData = array_combine($lookupKeys, $result);
     // We needed the lookupField in the original result, but drop it if we're not supposed to return it, otherwise we'll duplicate that field.
+    $columnsToDelete = [];
     if (!in_array($lookupField, $returnFields)) {
-      $lookupData = Columns::deleteColumns($lookupData, [$lookupField]);
+      $columnsToDelete[] = $lookupField;
+    }
+    if (!in_array('id', $returnFields)) {
+      $columnsToDelete[] = 'id';
+    }
+    if ($columnsToDelete) {
+      $lookupData = Columns::deleteColumns($lookupData, $columnsToDelete);
     }
     // For when the lookup value is blank.
-    $blankLookup = array_fill_keys($returnFields, '');
+    $blankLookup = array_fill_keys($returnFields, $defaultValue);
 
     foreach ($rows as &$row) {
       if ($row[$columnName]) {
