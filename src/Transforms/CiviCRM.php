@@ -59,7 +59,9 @@ class CiviCRM {
    * Return one or more fields from a record based on an existing value(s).
    * E.g. from external_identifier, return the contact_id.
    */
-  public static function lookup(array $rows, string $entity, array $lookupFields, array $returnFields, bool $noLogging = FALSE) : array {
+  public static function lookup(array $rows, string $entity, array $lookupFields, array $returnFields, bool $logErrors = TRUE) : array {
+    $logger = new Logging($entity);
+    $logHeadersWritten = FALSE;
     $lookupData = self::buildLookupTable($entity, $lookupFields, $returnFields);
     // For when the lookup value is blank.
     $noLookupColumns = array_fill_keys($returnFields, '');
@@ -74,13 +76,19 @@ class CiviCRM {
       }
       $compositeRowKey = strtoupper(implode("\x01", $compositeRowKey));
       if ($match) {
-        if (!$noLogging && !isset($lookupData[$compositeRowKey])) {
+        if ($logErrors && !isset($lookupData[$compositeRowKey])) {
+          if (!$logHeadersWritten) {
+            $logHeadersWritten = TRUE;
+            $csv = Logging::arrayToCsv(array_keys($row));
+            $logger->log('New Headers, ' . $csv);
+          }
+          $csv = Logging::arrayToCsv($row);
           // This probably shouldn't be $row[$columnName] when we haev a composite key.
-          Logging::log("Invalid $compositeRowKey lookup: $row[$columnName] . Row: " . implode(', ', $row));
+          $logger->log("Invalid $compositeRowKey lookup: $row[$columnName] . Row:, " . $csv);
         }
       }
-        // Create the new columns even if we don't fill them.
-        $row += $lookupData[$compositeRowKey] ?? $noLookupColumns;
+      // Create the new columns even if we don't fill them.
+      $row += $lookupData[$compositeRowKey] ?? $noLookupColumns;
     }
 
     // Delete new columns that aren't in the $returnFields.
@@ -126,4 +134,5 @@ class CiviCRM {
     }
     return $lookupData;
   }
+
 }

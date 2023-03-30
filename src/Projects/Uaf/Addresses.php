@@ -44,7 +44,7 @@ class Addresses {
     $rows = T\Columns::renameColumns($rows, ['id' => 'country_id']);
 
     // Lookup state_province by abbreviation.
-    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name', 'country_id' => 'country_id'], ['id'], TRUE);
+    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name', 'country_id' => 'country_id'], ['id'], FALSE);
     $completedLookupRows = array_filter($rows, function($row) {
       return $row['id'] || !$row['State'];
     });

@@ -8,14 +8,17 @@ class CivicrmApi4 implements WriterInterface {
   private bool $allowDuplicates;
   private array $matchFields;
   /**
-   * @var bool This is so we know whether to print the row headers.
+   * @var bool
+   * This is so we know whether to print the row headers.
    */
   private bool $errorFound = FALSE;
+  private Logging $logger;
 
   public function __construct($options) {
     $this->primaryEntity = $options['civi_primary_entity'];
     $this->allowDuplicates = $options['allow_duplicates'] ?? FALSE;
     $this->matchFields = $options['match_fields'] ?? ['id'];
+    $this->logger = new Logging('api4writer');
   }
 
   public function writeOne($row) : void {
@@ -35,18 +38,18 @@ class CivicrmApi4 implements WriterInterface {
         ]);
       }
       if ($result['error_message'] ?? FALSE) {
-        Logging::log("Failed to import: $row");
-        Logging::log("Error: $result");
+        $this->logger->log("Failed to import: $row");
+        $this->logger->log("Error: $result");
       }
     }
     catch (\CRM_Core_Exception $e) {
       if (!$this->errorFound) {
         $this->errorFound = TRUE;
-        Logging::log("Failed to import $this->primaryEntity");
-        Logging::log(implode(', ', array_keys($row)));
+        $this->logger->log("Failed to import $this->primaryEntity");
+        $this->logger->log(implode(', ', array_keys($row)));
       }
-      Logging::log(implode(', ', $row));
-      Logging::log("Error: " . $e->getMessage());
+      $this->logger->log(implode(', ', $row));
+      $this->logger->log("Error: " . $e->getMessage());
     }
   }
 
