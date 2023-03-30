@@ -59,24 +59,31 @@ class CiviCRM {
    * Return one or more fields from a record based on an existing value(s).
    * E.g. from external_identifier, return the contact_id.
    */
-  public static function lookup(array $rows, string $entity, array $lookupFields, array $returnFields, string $defaultValue = '') : array {
-    // Get all the lookup data in one query, much faster than one query per row.
-    foreach ($lookupFields as $lookupField) {
-      $where[] = [$lookupField, 'IS NOT NULL'];
+  public static function lookup(array $rows, string $entity, array $lookupFields, array $returnFields, bool $noLogging = FALSE) : array {
+    $lookupData = self::buildLookupTable($entity, $lookupFields, $returnFields);
+    // For when the lookup value is blank.
+    $noLookupColumns = array_fill_keys($returnFields, '');
+
+    foreach ($rows as &$row) {
+      // If we don't have values for all columns, don't do a lookup, assign the default value.
+      $match = TRUE;
+      $compositeRowKey = [];
+      foreach ($lookupFields as $columnName => $dontcare) {
+        $match = $match && (bool) $row[$columnName];
+        $compositeRowKey[] = $row[$columnName];
+      }
+      $compositeRowKey = strtoupper(implode("\x01", $compositeRowKey));
+      if ($match) {
+        if (!$noLogging && !isset($lookupData[$compositeRowKey])) {
+          // This probably shouldn't be $row[$columnName] when we haev a composite key.
+          Logging::log("Invalid $compositeRowKey lookup: $row[$columnName] . Row: " . implode(', ', $row));
+        }
+      }
+        // Create the new columns even if we don't fill them.
+        $row += $lookupData[$compositeRowKey] ?? $noLookupColumns;
     }
-    $result = (array) civicrm_api4($entity, 'get', [
-      'select' => array_merge($lookupFields, $returnFields),
-      'where' => $where,
-      'checkPermissions' => FALSE,
-    ]);
-    // Reindex the cache data for easiest lookup speed.
-    $lookupKeys = array_column($result, implode("\x01", $lookupFields));
-    // Uppercase for case-insensitive comparison.
-    array_walk($lookupKeys, function(&$lookupKey) {
-      $lookupKey = strtoupper($lookupKey);
-    });
-    $lookupData = array_combine($lookupKeys, $result);
-    // We needed the lookupField in the original result, but drop it if we're not supposed to return it, otherwise we'll duplicate that field.
+
+    // Delete new columns that aren't in the $returnFields.
     $columnsToDelete = [];
     foreach ($lookupFields as $lookupField) {
       if (!in_array($lookupField, $returnFields)) {
@@ -89,26 +96,34 @@ class CiviCRM {
     if ($columnsToDelete) {
       $lookupData = Columns::deleteColumns($lookupData, $columnsToDelete);
     }
-    // For when the lookup value is blank.
-    $blankLookup = array_fill_keys($returnFields, $defaultValue);
 
-    foreach ($rows as &$row) {
-      // If we don't have values for all columns, don't do a lookup, assign the default value.
-      $match = TRUE;
-      foreach ($lookupFields as $columnName => $lookupField) {
-        $match = $match && (bool) $row[$columnName];
-      }
-      if ($match) {
-        if (!$lookupData[strtoupper($row[$columnName])]) {
-          Logging::log("Invalid $columnName lookup: $row[$columnName] . Row: " . implode(', ', $row));
-        }
-        $row += $lookupData[strtoupper($row[$columnName])] ?? [];
-      }
-      else {
-        $row += $blankLookup;
-      }
-    }
     return $rows;
   }
 
+  /**
+   * Query CiviCRM and cache an array of all the values we might return.
+   */
+  private static function buildLookupTable(string $entity, array $lookupFields, array $returnFields) : array {
+    // Get all the lookup data in one query, much faster than one query per row.
+    foreach ($lookupFields as $lookupField) {
+      $where[] = [$lookupField, 'IS NOT NULL'];
+    }
+    $results = (array) civicrm_api4($entity, 'get', [
+      'select' => array_merge($lookupFields, $returnFields),
+      'where' => $where,
+      'checkPermissions' => FALSE,
+    ]);
+    // Reindex the cache data for easiest lookup speed. Composite keys when there are multiple lookup fields.
+    // This is a fancier array_column + array_combine.
+    $lookupData = [];
+    foreach ($results as $result) {
+      $compositeKey = [];
+      foreach ($lookupFields as $lookupField) {
+        $compositeKey[] = $result[$lookupField];
+      }
+      $compositeKey = strtoupper(implode("\x01", $compositeKey));
+      $lookupData[$compositeKey] = $result;
+    }
+    return $lookupData;
+  }
 }
