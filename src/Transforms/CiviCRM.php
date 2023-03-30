@@ -116,7 +116,7 @@ class CiviCRM {
     foreach ($lookupFields as $lookupField) {
       $where[] = [$lookupField, 'IS NOT NULL'];
     }
-    $results = (array) civicrm_api4($entity, 'get', [
+    $results = (array) \civicrm_api4($entity, 'get', [
       'select' => array_merge($lookupFields, $returnFields),
       'where' => $where,
       'checkPermissions' => FALSE,

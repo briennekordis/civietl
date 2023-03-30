@@ -35,12 +35,12 @@ class Addresses {
     $rowsWithISOCode = array_filter($rows, function($row) {
       return strlen($row['Country']) === 2;
     });
-    $rowsWithISOCode = T\CiviCRM::lookup($rowsWithISOCode, 'Country', ['Country' => 'iso_code'], ['id']);
+    $rowsWithISOCode = T\CiviCRM::lookup($rowsWithISOCode, 'Country', ['Country' => 'iso_code'], ['id'], FALSE);
     $rowsWithISOCode = T\Columns::deleteColumns($rowsWithISOCode, ['iso_code']);
-    $rowsWithName = array_diff_key($rows, $rowsWithISOCode);
-    $rowsWithName = T\CiviCRM::lookup($rowsWithName, 'Country', ['Country' => 'name'], ['id']);
+    $rowsWithCountryName = array_diff_key($rows, $rowsWithISOCode);
+    $rowsWithCountryName = T\CiviCRM::lookup($rowsWithCountryName, 'Country', ['Country' => 'name'], ['id'], FALSE);
     // rejoin the rows.
-    $rows = $rowsWithISOCode + $rowsWithName;
+    $rows = $rowsWithISOCode + $rowsWithCountryName;
     $rows = T\Columns::renameColumns($rows, ['id' => 'country_id']);
 
     // Lookup state_province by abbreviation.
@@ -52,11 +52,16 @@ class Addresses {
     $rowsWithPossibleAbbreviations = array_diff_key($rows, $completedLookupRows);
     // Drop the 'id' field so we can fill it anew.
     $rowsWithPossibleAbbreviations = T\Columns::deleteColumns($rowsWithPossibleAbbreviations, ['id']);
-    $rowsWithPossibleAbbreviations = T\CiviCRM::lookup($rowsWithPossibleAbbreviations, 'StateProvince', ['State' => 'abbreviation', 'country_id' => 'country_id'], ['id']);
+    $rowsWithPossibleAbbreviations = T\CiviCRM::lookup($rowsWithPossibleAbbreviations, 'StateProvince', ['State' => 'abbreviation', 'country_id' => 'country_id'], ['id'], FALSE);
 
-    // rejoin.
     $rows = $rowsWithPossibleAbbreviations + $completedLookupRows;
     $rows = T\Columns::renameColumns($rows, ['id' => 'state_province_id']);
+    // Validate addresses, log bad addresses to errors.
+    $rows = T\Cleanup::validateAddresses($rows, [
+      'state_province_id' => 'State',
+      'country_id' => 'Country',
+    ]);
+
     return $rows;
   }
 
