@@ -61,10 +61,12 @@ class CiviCRM {
    */
   public static function lookup(array $rows, string $entity, array $lookupFields, array $returnFields, bool $logErrors = TRUE) : array {
     $logger = new Logging($entity);
+    // We need this so we don't delete any of these later.
+    $originalColumns = array_keys(reset($rows));
     $logHeadersWritten = FALSE;
     $lookupData = self::buildLookupTable($entity, $lookupFields, $returnFields);
     // For when the lookup value is blank.
-    $noLookupColumns = array_fill_keys($returnFields, '');
+    $noLookupColumns = array_fill_keys($lookupFields + $returnFields, '');
 
     foreach ($rows as &$row) {
       // If we don't have values for all columns, don't do a lookup, assign the default value.
@@ -94,7 +96,7 @@ class CiviCRM {
     // Delete new columns that aren't in the $returnFields.
     $columnsToDelete = [];
     foreach ($lookupFields as $lookupField) {
-      if (!in_array($lookupField, $returnFields)) {
+      if (!in_array($lookupField, $returnFields) && !in_array($lookupField, $originalColumns)) {
         $columnsToDelete[] = $lookupField;
       }
     }
@@ -102,7 +104,7 @@ class CiviCRM {
       $columnsToDelete[] = 'id';
     }
     if ($columnsToDelete) {
-      $lookupData = Columns::deleteColumns($lookupData, $columnsToDelete);
+      $rows = Columns::deleteColumns($rows, $columnsToDelete);
     }
 
     return $rows;
@@ -116,7 +118,7 @@ class CiviCRM {
     foreach ($lookupFields as $lookupField) {
       $where[] = [$lookupField, 'IS NOT NULL'];
     }
-    $results = (array) civicrm_api4($entity, 'get', [
+    $results = (array) \civicrm_api4($entity, 'get', [
       'select' => array_merge($lookupFields, $returnFields),
       'where' => $where,
       'checkPermissions' => FALSE,

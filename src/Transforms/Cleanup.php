@@ -2,7 +2,6 @@
 namespace Civietl\Transforms;
 
 use Civietl\Logging;
-use Civietl\Maps;
 
 class Cleanup {
 
@@ -19,9 +18,10 @@ class Cleanup {
   }
 
   public static function filterInvalidWebsites($rows, $columnName) : array {
+    $logger = new Logging('Bad_Addresses');
     foreach ($rows as $key => $row) {
       if (!filter_var($row[$columnName], FILTER_VALIDATE_URL)) {
-        Logging::log("Invalid website in row: " . implode(', ', $row));
+        $logger->log("Invalid website in row: " . implode(', ', $row));
         unset($rows[$key]);
       }
     }
@@ -29,9 +29,10 @@ class Cleanup {
   }
 
   public static function filterInvalidEmails($rows, $columnName) : array {
+    $logger = new Logging('Bad_Addresses');
     foreach ($rows as $key => $row) {
       if (!filter_var($row[$columnName], FILTER_VALIDATE_EMAIL)) {
-        Logging::log("Invalid email in row: " . implode(', ', $row));
+        $logger->log("Invalid email in row: " . implode(', ', $row));
         unset($rows[$key]);
       }
     }
@@ -89,6 +90,58 @@ class Cleanup {
       $row['last_name'] = end($names);
     }
     return $rows;
+  }
+
+  /**
+   * Will generate an error log for all bad addresses and remove them from the data.
+   * @var array $rows
+   * @var array $fieldMapping
+   *  Should contain a mapping of the Civi field and the field it's derived from.
+   *  E.g. ['state_province_id' => 'State', 'country_id' => 'Country'], etc.
+   */
+  public static function validateAddresses(array $rows, array $fieldMapping) : array {
+    foreach ($rows as &$row) {
+      $row['errors'] = [];
+      // Required fields.
+      if (!$row['contact_id']) {
+        $row['errors'][] = 'No contact ID.';
+      }
+      if (!(bool) ($row['location_type_id'] ?? $row['location_type_id:name'] ?? $row['location_type_id:label'] ?? FALSE)) {
+        $row['errors'][] = 'No location type';
+      }
+      // State/country/county IDs are blank but the original field is not.
+      foreach ($fieldMapping as $civiField => $originalField) {
+        if (!$row[$civiField] && $row[$originalField]) {
+          $row['errors'][] = "$civiField could not be determined from $originalField ($row[$originalField])";
+        }
+      }
+      // Check for too-long fields.
+      $maxLengths = array_fill_keys(['street_address', 'supplemental_address_1', 'supplemental_address_2', 'supplemental_address_3'], 96) +
+       array_fill_keys(['postal_code', 'city'], 64);
+      foreach ($maxLengths as $field => $maxLength) {
+        if (mb_strlen($row[$field]) > $maxLength) {
+          $row['errors'][] = "The $field must not exceed $maxLength characters.";
+        }
+      }
+    }
+    $headersWritten = FALSE;
+    $logger = new Logging('Bad_Addresses');
+    foreach ($rows as &$row) {
+      $row['errors'] = implode(", ", $row['errors']);
+      if ($row['errors']) {
+        if (!$headersWritten) {
+          $headersWritten = TRUE;
+          $csv = Logging::arrayToCsv(array_keys($row));
+          $logger->log($csv);
+        }
+        $csv = Logging::arrayToCsv($row);
+        $logger->log($csv);
+      }
+      // Don't pass on rows with errors to the writer.
+      unset($row);
+    }
+    return $rows;
+
   }
 
 }
