@@ -23,7 +23,7 @@ class RowFilters {
   }
 
   /**
-   * Get a random sample of rows for testing.
+   * Filter out rows in which a certain column is blank.
    */
   public static function filterBlanks(array $rows, string $columnName) : array {
     foreach ($rows as $key => $row) {
