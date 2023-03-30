@@ -88,7 +88,7 @@ class Contributions {
     // If the Contribution has an Appeal id, use that, if not, use the Campaign id if not null.
     $rows = T\Columns::coalesceColumns($rows, ['appeal_external_identifier', 'campaign_external_identifier'], 'campaign_or_appeal');
     // Look up and return the id of the Campaign this Contribution is connected to.
-    $rows = T\CiviCRM::lookup($rows, 'Campaign', ['campaign_or_appeal', 'external_identifier'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Campaign', ['campaign_or_appeal' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'campaign_id']);
 
     return $rows;
