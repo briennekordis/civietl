@@ -197,6 +197,7 @@ $importSettings = [
     'writerOptions' => [
       'civi_primary_entity' => 'Contribution',
       'file_path' => "$workroot/data/tempCon.csv",
+      'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
   ],
   'ContributionNotes' => [
@@ -232,7 +233,7 @@ $importSettings = [
   ],
   'SplitContactsRelationships' => [
     'readerOptions' => [
-      'file_path' => "$workroot/raw data/contact_split_relationships.csv",
+      'file_path' => "$workroot/raw data/full_archive/constituents.csv",
       'data_primary_key' => '',
     ],
     'writerOptions' => [
