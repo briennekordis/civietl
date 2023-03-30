@@ -25,7 +25,6 @@ class Contributions {
       'Payment type',
       'Check/Reference No.',
       'Anonymous gift?',
-      'Gift owner',
       'Vehicle Name',
     ]);
     // Rename the columns that will be imported to match CiviCRM fields.
