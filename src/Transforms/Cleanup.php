@@ -127,7 +127,7 @@ class Cleanup {
     }
     $headersWritten = FALSE;
     $logger = new Logging('Bad_Addresses');
-    foreach ($rows as &$row) {
+    foreach ($rows as $key => &$row) {
       $row['errors'] = implode(", ", $row['errors']);
       if ($row['errors']) {
         if (!$headersWritten) {
@@ -137,10 +137,11 @@ class Cleanup {
         }
         $csv = Logging::arrayToCsv($row);
         $logger->log($csv);
+        // Don't pass on rows with errors to the writer.
+        unset($rows[$key]);
       }
-      // Don't pass on rows with errors to the writer.
-      unset($row);
     }
+    $rows = T\Columns::deleteColumns($rows, ['errors']);
     return $rows;
   }
 
