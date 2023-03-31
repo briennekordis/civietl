@@ -23,7 +23,7 @@ class Addresses {
       'Street_2' => 'supplemental_address_2',
       'Street_3' => 'supplemental_address_3',
     ]);
-    $rows = T\Columns::deleteColumns($rows, ['LGL Constituent ID', 'Constituent Name', 'LGL Address ID', 'County', 'Seasonal from', 'Seasonal to', 'Is Valid?', 'Street']);
+    $rows = T\Columns::deleteColumns($rows, ['Constituent Name', 'LGL Address ID', 'County', 'Seasonal from', 'Seasonal to', 'Is Valid?', 'Street']);
 
     // CLEANUP
     // Trim every field.
@@ -67,47 +67,25 @@ class Addresses {
     });
     $completedRows = T\Columns::newColumnWithConstant($completedRows, 'id', '');
     $rows = array_diff_key($rows, $completedRows);
-    // Lookup state_province by abbreviation.
-    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'abbreviation', 'country_id' => 'country_id'], ['id'], FALSE);
-    $completedRows += array_filter($rows, function($row) {
-      return $row['id'];
-    });
-    $rows = array_diff_key($rows, $completedRows);
-    $rows = T\Columns::deleteColumns($rows, ['id']);
-    // Lookup state_province by name.
-    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name', 'country_id' => 'country_id'], ['id'], FALSE);
-    $completedRows += array_filter($rows, function($row) {
-      return $row['id'];
-    });
-    $rows = array_diff_key($rows, $completedRows);
-    $rows = T\Columns::deleteColumns($rows, ['id']);
-    // Lookup state_province by abbreviation with default_country_id.
-    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'abbreviation', 'country_id_with_default' => 'country_id'], ['id'], FALSE);
-    $completedRows += array_filter($rows, function($row) {
-      return $row['id'];
-    });
-    $rows = array_diff_key($rows, $completedRows);
-    $rows = T\Columns::deleteColumns($rows, ['id']);
-    // Lookup state_province by name with default_country_id.
-    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name', 'country_id_with_default' => 'country_id'], ['id'], FALSE);
-    $completedRows += array_filter($rows, function($row) {
-      return $row['id'];
-    });
-    $rows = array_diff_key($rows, $completedRows);
-    $rows = T\Columns::deleteColumns($rows, ['id']);
-    // Lookup state_province by abbreviation with no country.
-    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'abbreviation'], ['id'], FALSE);
-    $completedRows += array_filter($rows, function($row) {
-      return $row['id'];
-    });
-    $rows = array_diff_key($rows, $completedRows);
-    $rows = T\Columns::deleteColumns($rows, ['id']);
-    // Lookup state_province by name with no country.
-    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name'], ['id'], FALSE);
-    $completedRows += array_filter($rows, function($row) {
-      return $row['id'];
-    });
-    $rows = array_diff_key($rows, $completedRows);
+
+    // We do a bunch of different Civi lookups (state + country, state + default country, state alone - each for both abbreviation and name)
+    $stateLookups = [
+      ['State' => 'abbreviation', 'country_id' => 'country_id'],
+      ['State' => 'name', 'country_id' => 'country_id'],
+      ['State' => 'abbreviation', 'country_id_with_default' => 'country_id'],
+      ['State' => 'name', 'country_id_with_default' => 'country_id'],
+      ['State' => 'abbreviation'],
+      ['State' => 'name'],
+    ];
+    foreach ($stateLookups as $stateLookup) {
+      $rows = T\CiviCRM::lookup($rows, 'StateProvince', $stateLookup, ['id'], FALSE);
+      $completedRows += array_filter($rows, function($row) {
+        return $row['id'];
+      });
+      $rows = array_diff_key($rows, $completedRows);
+      $rows = T\Columns::deleteColumns($rows, ['id']);
+    }
+    $rows = T\Columns::newColumnWithConstant($rows, 'id', '');
 
     // rejoin the rows.
     $rows += $completedRows;
@@ -120,6 +98,8 @@ class Addresses {
       'state_province_id' => 'State',
       'country_id' => 'Country',
     ]);
+    // We saved this for the error list, now let's delete it.
+    $rows = T\Columns::deleteColumns($rows, ['LGL Constituent ID']);
 
     return $rows;
   }
@@ -136,6 +116,11 @@ class Addresses {
     'Czechia' => 'Czech Republic',
   ];
 
-  const UAF_STATE_MAP = [];
+  // We need a better system for these countries-as-states and vice versa..
+  const UAF_STATE_MAP = [
+    'England' => '',
+    'Scotland' => '',
+    'Wales' => '',
+  ];
 
 }
