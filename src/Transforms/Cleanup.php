@@ -162,4 +162,16 @@ class Cleanup {
     return $rows;
   }
 
+  /**
+   * Compare two columns and if they are the same, set the second column a new value.
+   */
+  public static function compareAndSet(array $rows, string $firstColumn, string $secondColumn, string $newValue) {
+    foreach ($rows as &$row) {
+      if ($row[$firstColumn] === $row[$secondColumn]) {
+        $row[$secondColumn] = $newValue;
+      }
+    }
+    return $rows;
+  }
+
 }
