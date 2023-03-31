@@ -134,6 +134,9 @@ class CiviCRM {
       $compositeKey = strtoupper(implode("\x01", $compositeKey));
       $lookupData[$compositeKey] = $result;
     }
+    if (!$lookupData) {
+      throw new \Exception("No CiviCRM lookup data found. Entity: $entity");
+    }
     return $lookupData;
   }
 
