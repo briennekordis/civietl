@@ -66,7 +66,7 @@ class CiviCRM {
     $logHeadersWritten = FALSE;
     $lookupData = self::buildLookupTable($entity, $lookupFields, $returnFields);
     // For when the lookup value is blank.
-    $noLookupColumns = array_fill_keys($lookupFields + $returnFields, '');
+    $noLookupColumns = array_fill_keys(array_merge($lookupFields, $returnFields, ['id']), '');
 
     foreach ($rows as &$row) {
       // If we don't have values for all columns, don't do a lookup, assign the default value.
