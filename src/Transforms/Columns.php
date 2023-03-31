@@ -42,12 +42,19 @@ class Columns {
     return $rows;
   }
 
-  /**
-   * Can also be used to overwrite an existing row's values.
-   */
   public static function newColumnWithConstant(array $rows, string $newColumnName, mixed $constant) : array {
     foreach ($rows as &$row) {
       $row[$newColumnName] = $constant;
+    }
+    return $rows;
+  }
+
+  /**
+   * Array element can be empty or missing.
+   */
+  public static function fillEmptyValues(array $rows, string $newColumnName, mixed $constant) : array {
+    foreach ($rows as &$row) {
+      $row[$newColumnName] ?: $constant;
     }
     return $rows;
   }
