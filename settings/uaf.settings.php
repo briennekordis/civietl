@@ -98,7 +98,6 @@ $importSettings = [
       'civi_primary_entity' => 'Address',
       'file_path' => "$workroot/data/addresses.csv",
     ],
-    'writer_type' => 'CsvWriter',
   ],
   'Notes' => [
     'readerOptions' => [
