@@ -2,6 +2,7 @@
 namespace Civietl\Transforms;
 
 use Civietl\Logging;
+use Civietl\Transforms as T;
 
 class Cleanup {
 
@@ -112,7 +113,7 @@ class Cleanup {
       // State/country/county IDs are blank but the original field is not.
       foreach ($fieldMapping as $civiField => $originalField) {
         if (!$row[$civiField] && $row[$originalField]) {
-          $row['errors'][] = "$civiField could not be determined from $originalField ($row[$originalField])";
+          $row['errors'][] = "$civiField could not be determined from $originalField: $row[$originalField]";
         }
       }
       // Check for too-long fields.
@@ -141,7 +142,23 @@ class Cleanup {
       unset($row);
     }
     return $rows;
+  }
 
+  /**
+   * If your state is e.g. "Canada" then move it to country.
+   */
+  public static function moveStatesToCountries(array $rows, string $stateColumn, string $countryColumn) {
+    T\Columns::columnsPresent($rows, [$stateColumn, $countryColumn], __FUNCTION__);
+    // Only get countries whose name can't possibly be a state, or where the only state with its name is in the country (e.g. Belize).
+    $dao = \CRM_Core_DAO::executeQuery('select cc.name from civicrm_country cc LEFT JOIN civicrm_state_province csp ON cc.name = csp.name WHERE csp.name IS NULL OR cc.id = csp.country_id;');
+    while ($dao->fetch()) {
+      $countries[] = $dao->name;
+    }
+    // Move states to countries.
+    $rows = T\ValueTransforms::valueMapper($rows, $stateColumn, array_combine($countries, $countries), $countryColumn, FALSE);
+    // Blank moved states.
+    $rows = T\ValueTransforms::valueMapper($rows, $stateColumn, array_fill_keys($countries, ''), NULL, FALSE);
+    return $rows;
   }
 
 }
