@@ -24,37 +24,97 @@ class Addresses {
       'Street_3' => 'supplemental_address_3',
     ]);
     $rows = T\Columns::deleteColumns($rows, ['LGL Constituent ID', 'Constituent Name', 'LGL Address ID', 'County', 'Seasonal from', 'Seasonal to', 'Is Valid?', 'Street']);
+
+    // CLEANUP
     // Trim every field.
     $rows = T\Text::trim($rows, array_keys(reset($rows)));
+    // Move obvious states to countries.
+    $rows = T\Cleanup::moveStatesToCountries($rows, 'State', 'Country');
     // Clean up and map countries. First the ones that are special to this data, then all the rest.
-    $rows = T\ValueTransforms::valueMapper($rows, 'Country', \Civietl\Maps::COUNTRY_MAP);
-    $rows = T\ValueTransforms::valueMapper($rows, 'Country', self::UAF_COUNTRY_MAP);
-    // Set a default country (necessary for doing state cleanups)
-    $rows = T\ValueTransforms::valueMapper($rows, 'Country', ['' => 'United States']);
-    // Do lookups by ISO code and name separately.
-    $rowsWithISOCode = array_filter($rows, function($row) {
-      return strlen($row['Country']) === 2;
+    $rows = T\ValueTransforms::valueMapper($rows, 'Country', \Civietl\Maps::COUNTRY_MAP + self::UAF_COUNTRY_MAP, NULL, FALSE);
+    $rows = T\ValueTransforms::valueMapper($rows, 'State', \Civietl\Maps::STATE_MAP + self::UAF_STATE_MAP, NULL, FALSE);
+
+    // COUNTRY LOOKUPS
+    // $completedCoutryRows is first records with no country, then adding lookups by ISO code, then lookups by name.
+    $completedRows = [];
+    $completedRows += array_filter($rows, function($row) {
+      return !$row['Country'];
     });
-    $rowsWithISOCode = T\CiviCRM::lookup($rowsWithISOCode, 'Country', ['Country' => 'iso_code'], ['id'], FALSE);
-    $rowsWithCountryName = array_diff_key($rows, $rowsWithISOCode);
-    $rowsWithCountryName = T\CiviCRM::lookup($rowsWithCountryName, 'Country', ['Country' => 'name'], ['id'], FALSE);
+    $completedRows = T\Columns::newColumnWithConstant($completedRows, 'id', '');
+    $rows = array_diff_key($rows, $completedRows);
+    $rows = T\CiviCRM::lookup($rows, 'Country', ['Country' => 'iso_code'], ['id'], FALSE);
+    $completedRows += array_filter($rows, function($row) {
+      return $row['id'];
+    });
+    $rows = array_diff_key($rows, $completedRows);
+    $rows = T\Columns::deleteColumns($rows, ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Country', ['Country' => 'name'], ['id'], FALSE);
+    $completedRows += array_filter($rows, function($row) {
+      return $row['id'];
+    });
+    $rows = array_diff_key($rows, $completedRows);
     // rejoin the rows.
-    $rows = $rowsWithISOCode + $rowsWithCountryName;
+    $rows += $completedRows;
     $rows = T\Columns::renameColumns($rows, ['id' => 'country_id']);
 
-    // Lookup state_province by abbreviation.
-    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name', 'country_id' => 'country_id'], ['id'], FALSE);
-    $completedLookupRows = array_filter($rows, function($row) {
-      return $row['id'] || !$row['State'];
+    // STATE LOOKUPS
+    // Let's add the default country column for doing lookups both with and without it.
+    $defaultCountryId = 1228;
+    $rows = T\ValueTransforms::valueMapper($rows, 'country_id', ['' => $defaultCountryId], 'country_id_with_default');
+    $completedRows = [];
+    $completedRows += array_filter($rows, function($row) {
+      return !$row['State'];
     });
-    // Filter the list to records that weren't yet matched but have a state value in case they're abbreviations.
-    $rowsWithPossibleAbbreviations = array_diff_key($rows, $completedLookupRows);
-    // Drop the 'id' field so we can fill it anew.
-    $rowsWithPossibleAbbreviations = T\Columns::deleteColumns($rowsWithPossibleAbbreviations, ['id']);
-    $rowsWithPossibleAbbreviations = T\CiviCRM::lookup($rowsWithPossibleAbbreviations, 'StateProvince', ['State' => 'abbreviation', 'country_id' => 'country_id'], ['id'], FALSE);
+    $completedRows = T\Columns::newColumnWithConstant($completedRows, 'id', '');
+    $rows = array_diff_key($rows, $completedRows);
+    // Lookup state_province by abbreviation.
+    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'abbreviation', 'country_id' => 'country_id'], ['id'], FALSE);
+    $completedRows += array_filter($rows, function($row) {
+      return $row['id'];
+    });
+    $rows = array_diff_key($rows, $completedRows);
+    $rows = T\Columns::deleteColumns($rows, ['id']);
+    // Lookup state_province by name.
+    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name', 'country_id' => 'country_id'], ['id'], FALSE);
+    $completedRows += array_filter($rows, function($row) {
+      return $row['id'];
+    });
+    $rows = array_diff_key($rows, $completedRows);
+    $rows = T\Columns::deleteColumns($rows, ['id']);
+    // Lookup state_province by abbreviation with default_country_id.
+    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'abbreviation', 'country_id_with_default' => 'country_id'], ['id'], FALSE);
+    $completedRows += array_filter($rows, function($row) {
+      return $row['id'];
+    });
+    $rows = array_diff_key($rows, $completedRows);
+    $rows = T\Columns::deleteColumns($rows, ['id']);
+    // Lookup state_province by name with default_country_id.
+    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name', 'country_id_with_default' => 'country_id'], ['id'], FALSE);
+    $completedRows += array_filter($rows, function($row) {
+      return $row['id'];
+    });
+    $rows = array_diff_key($rows, $completedRows);
+    $rows = T\Columns::deleteColumns($rows, ['id']);
+    // Lookup state_province by abbreviation with no country.
+    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'abbreviation'], ['id'], FALSE);
+    $completedRows += array_filter($rows, function($row) {
+      return $row['id'];
+    });
+    $rows = array_diff_key($rows, $completedRows);
+    $rows = T\Columns::deleteColumns($rows, ['id']);
+    // Lookup state_province by name with no country.
+    $rows = T\CiviCRM::lookup($rows, 'StateProvince', ['State' => 'name'], ['id'], FALSE);
+    $completedRows += array_filter($rows, function($row) {
+      return $row['id'];
+    });
+    $rows = array_diff_key($rows, $completedRows);
 
-    $rows = $rowsWithPossibleAbbreviations + $completedLookupRows;
+    // rejoin the rows.
+    $rows += $completedRows;
     $rows = T\Columns::renameColumns($rows, ['id' => 'state_province_id']);
+    // $rows = T\Columns::deleteColumns($rows, ['id']);
+    $rows = T\Columns::deleteColumns($rows, ['country_id_with_default']);
+
     // Validate addresses, log bad addresses to errors.
     $rows = T\Cleanup::validateAddresses($rows, [
       'state_province_id' => 'State',
@@ -75,5 +135,7 @@ class Addresses {
     '70115' => 'United States',
     'Czechia' => 'Czech Republic',
   ];
+
+  const UAF_STATE_MAP = [];
 
 }
