@@ -48,4 +48,16 @@ class Text {
     return $rows;
   }
 
+  /**
+   * Add a specified string to the beginning of another string.
+   */
+  public static function prependText(array $rows, string $columnName, string $prependString) {
+    foreach ($rows as &$row) {
+      foreach ($row as $columnName => $value) {
+        $row[$columnName] = $prependString . $value;
+      }
+    }
+    return $rows;
+  }
+
 }
