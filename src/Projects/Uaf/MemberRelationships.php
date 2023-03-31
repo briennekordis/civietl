@@ -34,6 +34,13 @@ class MemberRelationships {
     // Clean up the relationships.
     $rows = T\Columns::newColumnWithConstant($rows, 'is_active', 0);
     $rows = T\ValueTransforms::valueMapper($rows, 'Relationship Type', ['UAF Board of Directors' => 'Board Member of', 'UAF Staff' => 'Employee of', 'US Advisory Council Members' => 'US Advisory Council Member for']);
+    // Handle Relationships are still active but have an impercise end date in LGL.
+    $rows = T\ValueTransforms::valueMapper($rows, 'end_date', ['2999-12-31' => '']);
+    $rowsWithEndDate = T\RowFilters::filterBlanks($rows, 'end_date');
+    $rowsWithoutEndDate = array_diff_key($rows, $rowsWithEndDate);
+    $rowsWithoutEndDate = T\ValueTransforms::valueMapper($rowsWithoutEndDate, 'is_active', [0 => 1]);
+    // Merge the two types of rows together again
+    $rows = $rowsWithEndDate + $rowsWithoutEndDate;
     // Get relationship type IDs.
     $rows = T\CiviCRM::lookup($rows, 'RelationshipType', ['Relationship Type' => 'name_a_b'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'relationship_type_id']);
