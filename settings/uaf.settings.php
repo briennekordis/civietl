@@ -20,6 +20,7 @@ $importSettings = [
       'file_path' => "$workroot/data/contacts.csv",
       // required for CiviCrmApi4: civi_primary_entity.
       'civi_primary_entity' => 'Contact',
+      'match_fields' => ['external_identifier'],
     ],
   ],
   'ContactSplit' => [
@@ -124,7 +125,7 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'FinancialType',
-      'file_path' => "$workroot/data/tempFT.csv",
+      'match_fields' => ['name'],
     ],
   ],
   'OptionGroups' => [
@@ -134,7 +135,7 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'OptionGroup',
-      'file_path' => "$workroot/data/tempOG.csv",
+      'match_fields' => ['name'],
     ],
   ],
   'OptionValues' => [
@@ -144,7 +145,7 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'OptionValue',
-      'file_path' => "$workroot/data/tempOV.csv",
+      'match_fields' => ['name'],
     ],
   ],
   'CustomGroups' => [
@@ -154,7 +155,6 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'CustomGroup',
-      'file_path' => "$workroot/data/tempCG.csv",
       'match_fields' => ['name'],
     ],
   ],
@@ -165,7 +165,7 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'CustomField',
-      'file_path' => "$workroot/data/tempCF.csv",
+      'match_fields' => ['name'],
     ],
   ],
   'Campaigns' => [
