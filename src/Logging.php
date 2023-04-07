@@ -10,6 +10,7 @@ class Logging {
 
   public function __construct(string $channel) {
     if ($GLOBALS['newEtlStarted']) {
+      // FIXME: How do we not delete logs not associated with the current run?
       $this->deletePreviousLogs();
       $GLOBALS['newEtlStarted'] = FALSE;
     }
