@@ -40,7 +40,7 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'ContactType',
-      'file_path' => "$workroot/data/tempCT.csv",
+      'match_fields' => ['name'],
     ],
   ],
   'GrantMakers' => [
@@ -53,16 +53,16 @@ $importSettings = [
       'civi_primary_entity' => 'Contact',
     ],
   ],
-  // 'CommunicationPreferences' => [
-  //   'readerOptions' => [
-  //     'file_path' => "$workroot/raw data/full_archive/constituents.csv",
-  //     'data_primary_key' => 'LGL Constituent ID',
-  //   ],
-  //   'writerOptions' => [
-  //     'file_path' => "$workroot/data/contacts.csv",
-  //     'civi_primary_entity' => 'Contact',
-  //   ],
-  // ],
+  'CommunicationPreferences' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/constituents.csv",
+      'data_primary_key' => 'LGL Constituent ID',
+    ],
+    'writerOptions' => [
+      'file_path' => "$workroot/data/contacts.csv",
+      'civi_primary_entity' => 'Contact',
+    ],
+  ],
   'Websites' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/websites.csv",
@@ -175,7 +175,7 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'Campaign',
-      'file_path' => "$workroot/data/tempCmp.csv",
+      'match_fields' => ['external_identifier'],
     ],
   ],
   'Appeals' => [
@@ -185,7 +185,7 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'Campaign',
-      'file_path' => "$workroot/data/tempA.csv",
+      'match_fields' => ['external_identifier'],
     ],
   ],
   'Contributions' => [
