@@ -231,6 +231,17 @@ $importSettings = [
     ],
     // 'writer_type' => 'CsvWriter',
   ],
+  'ContributionsInKindNotes' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_in_kind.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Note',
+      'file_path' => "$workroot/data/tempConNotes.csv",
+    ],
+    // 'writer_type' => 'CsvWriter',
+  ],
   'SoftCredits' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/gifts_soft_credits.csv",
