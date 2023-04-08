@@ -209,6 +209,17 @@ $importSettings = [
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
   ],
+  'ContributionsInKind' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_in_kind.csv",
+      'data_primary_key' => 'LGL Gift ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Contribution',
+      'file_path' => "$workroot/data/tempConKind.csv",
+      'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
+    ],
+  ],
   'ContributionNotes' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/gift_gifts.csv",
