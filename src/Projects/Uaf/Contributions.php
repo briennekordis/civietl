@@ -17,7 +17,6 @@ class Contributions {
       'Fund',
       'LGL Appeal ID',
       'Gift Category',
-      'Gift note',
       'Gift Amount',
       'Deductible amount',
       'Gift date',
