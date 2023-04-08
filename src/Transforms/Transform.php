@@ -42,4 +42,40 @@ class Transform {
     return $rows;
   }
 
+  /**
+   * Given a column with different values, create a separate column for each value.
+   * FIXME: Write example
+   * denormalizeColumn($rows, 'contact_id', 'Communication Tag', ['Do not mail' => 'do_not_mail', 'Do not call' => 'do_not_phone', ''Do not email' => 'do_not_email']')
+   * Given data:
+   * contact_id | Communication Tag
+   * 7          | Do Not Call
+   * 7          | Do Not Mail
+   * 8          | Do Not Email
+   * 8          | Do Not Mail
+   *
+   * Return:
+   * contact_id | do_not_call | do_not_mail | do_not_email
+   * 7          |           1 |           1 |
+   * 8          |             |           1 |            1
+   *
+   * FIXME: Not very efficient. Also you lose all your columns that aren't explicitly named.
+   */
+  public static function denormalizeColumn(array $rows, string $keyColumn, string $targetColumn, array $columnMap) : array {
+    $newRows = [];
+    // Set all the columns up in $newRows.
+    foreach (array_unique(array_column($rows, $keyColumn)) as $keyColumnValue) {
+      foreach ($columnMap as $newColumnName) {
+        $newRows[$keyColumnValue][$newColumnName] = 0;
+      }
+    }
+    foreach ($rows as $row) {
+      // if the target column's value is a key in the $columnMap, set $newRows[the contact id][column map's value] = TRUE
+      if ($columnMap[$row[$targetColumn]] ?? FALSE) {
+        // Bitwise OR converts boolean to integer.
+        $newRows[$row[$keyColumn]][$columnMap[$row[$targetColumn]]] |= TRUE;
+      }
+    }
+    return $newRows;
+  }
+
 }
