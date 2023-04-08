@@ -237,7 +237,17 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'ContributionSoft',
-      'file_path' => "$workroot/data/tempSC.csv",
+      'file_path' => "$workroot/data/tempSCH.csv",
+    ],
+  ],
+  'SoftCreditsInMemory' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_in_memory_of.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'ContributionSoft',
+      'file_path' => "$workroot/data/tempSCM.csv",
     ],
   ],
   'RelationshipTypes' => [
