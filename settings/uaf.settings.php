@@ -230,6 +230,16 @@ $importSettings = [
       'file_path' => "$workroot/data/tempSC.csv",
     ],
   ],
+  'SoftCreditsInHonor' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_in_honor_of.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'ContributionSoft',
+      'file_path' => "$workroot/data/tempSC.csv",
+    ],
+  ],
   'RelationshipTypes' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/relationshipTypes.csv",
