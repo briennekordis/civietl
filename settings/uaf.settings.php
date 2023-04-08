@@ -208,7 +208,17 @@ $importSettings = [
       'civi_primary_entity' => 'Note',
       'file_path' => "$workroot/data/tempConNotes.csv",
     ],
-    'writer_type' => 'CsvWriter',
+    // 'writer_type' => 'CsvWriter',
+  ],
+  'SoftCredits' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gifts_soft_credits.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'ContributionSoft',
+      'file_path' => "$workroot/data/tempSC.csv",
+    ],
   ],
   'RelationshipTypes' => [
     'readerOptions' => [
