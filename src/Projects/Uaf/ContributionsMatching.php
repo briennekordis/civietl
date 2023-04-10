@@ -17,7 +17,6 @@ class ContributionsMatching {
       'Gift Type',
       'LGL Campaign ID',
       'Fund',
-      'LGL Appeal ID',
       'Gift Category',
       'Gift Amount',
       'Deductible amount',
@@ -31,7 +30,6 @@ class ContributionsMatching {
       'Gift Type' => 'Additional_Contribution_Data.Contribution_type:label',
       'LGL Campaign ID' => 'campaign_external_identifier',
       'Fund' => 'financial_type_id:label',
-      'LGL Appeal ID' => 'appeal_external_identifier',
       'Gift Category' => 'Additional_Contribution_Data.Contribution_type:label',
       'Gift Amount' => 'total_amount',
       'Gift date' => 'receive_date',
@@ -62,10 +60,10 @@ class ContributionsMatching {
     // If the Contribution has a Vehicle, use that, if not, use the LGL Constituent ID.
     $rows = T\Columns::coalesceColumns($rows, ['vehicle_external_identifier', 'contact_external_identifier'], 'constituent_or_vehicle');
     // Look up and return the id of the Contact this Contribution is connected to.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', ['constituent_or_vehicle' => 'external_identifier'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
 
-    // Handle DAF Contributions and *not* Third Party Giving Contirbutions.
+    // Filter out Third Party Giving Contributions.
     // Split rows into those with a Vehicle and those without.
     $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_name');
     $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
@@ -75,13 +73,7 @@ class ContributionsMatching {
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
       return $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
     });
-    // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
-    $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
-    // Assign a Donor Advisor for DAF Contributions.
-    $rowsWithDAF = T\CiviCRM::lookup($rowsWithDAF, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
-    $rowsWithDAF = T\Columns::renameColumns($rowsWithDAF, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
-    // Merge the two types of rows back into one.
-    $rows = $rowsWithDAF + $rowsWithNoVehicle;
+    $rows = $rowsWithNoVehicle;
 
     // Connect the matching Contribution.
     $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
@@ -90,11 +82,8 @@ class ContributionsMatching {
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
     $rows = T\ValueTransforms::valueMapper($rows, 'campaign_external_identifier', ['0' => '', '497' => '']);
-    $rows = T\ValueTransforms::valueMapper($rows, 'appeal_external_identifier', ['0' => '', '2772' => '', '2662' => '']);
-    // If the Contribution has an Appeal id, use that, if not, use the Campaign id if not null.
-    $rows = T\Columns::coalesceColumns($rows, ['appeal_external_identifier', 'campaign_external_identifier'], 'campaign_or_appeal');
     // Look up and return the id of the Campaign this Contribution is connected to.
-    $rows = T\CiviCRM::lookup($rows, 'Campaign', ['campaign_or_appeal' => 'external_identifier'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Campaign', ['campaign_external_identifier' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'campaign_id']);
 
     return $rows;
