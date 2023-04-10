@@ -24,7 +24,7 @@ class SoftCredits {
     // // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
     // $rows = T\RowFilters::randomSample($rows, 5);
     // Look up and return the external_identifier of the Contribution.
-    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['contribution_external_identifier' => 'external_identifier'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['contribution_external_identifier' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contribution_id']);
     // Look up and return the external_identifier of the Contact to whom the soft credit is assigned.
     $rows = T\CiviCRM::lookup($rows, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);

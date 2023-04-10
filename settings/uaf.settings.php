@@ -266,7 +266,7 @@ $importSettings = [
   ],
   'SoftCredits' => [
     'readerOptions' => [
-      'file_path' => "$workroot/raw data/full_archive/gifts_soft_credits.csv",
+      'file_path' => "$workroot/raw data/full_archive/gift_soft_credits.csv",
       'data_primary_key' => '',
     ],
     'writerOptions' => [
