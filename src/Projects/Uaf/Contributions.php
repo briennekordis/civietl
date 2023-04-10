@@ -85,7 +85,7 @@ class Contributions {
     // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
     $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
     // Assign a Donor Advisor for DAF Contributions.
-    $rowsWithDAF = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
+    $rowsWithDAF = T\CiviCRM::lookup($rowsWithDAF, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
     $rowsWithDAF = T\Columns::renameColumns($rowsWithDAF, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
     // Merge the two types of rows back into one.
     $rows = $rowsWithDAF + $rowsWithNoVehicle;
