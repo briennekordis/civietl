@@ -71,14 +71,24 @@ class Contributions {
     // Look up and return the id of the Contact this Contribution is connected to.
     $rows = T\CiviCRM::lookup($rows, 'Contact', ['constituent_or_vehicle' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
-    // Split rows into those with vehicles and those without
+
+    // Handle DAF Contributions and *not* Third Party Giving Contirbutions.
+    // Split rows into those with a Vehicle and those without.
     $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_name');
     $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
-    // Assign a Donor Advisor for Contributions with a Vehicle.
-    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
-    $rowsWithVehicle = T\Columns::renameColumns($rowsWithVehicle, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
+    // Look up the Contact Subtype of rows with a Vehicle.
+    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
+    // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
+    $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
+      return $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
+    });
+    // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
+    $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
+    // Assign a Donor Advisor for DAF Contributions.
+    $rowsWithDAF = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
+    $rowsWithDAF = T\Columns::renameColumns($rowsWithDAF, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
     // Merge the two types of rows back into one.
-    $rows = $rowsWithVehicle + $rowsWithNoVehicle;
+    $rows = $rowsWithDAF + $rowsWithNoVehicle;
 
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
