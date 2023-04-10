@@ -47,6 +47,9 @@ class ContributionsInKind {
     array_walk($rows, function(&$row) {
       $row['non_deductible_amount'] = $row['total_amount'] - $row['Deductible amount'];
     });
+    // Map empty 'Fund' to 'In-Kind'
+    $rows = T\ValueTransforms::valueMapper($rows, 'financial_type_id:label', ['' => 'In-Kind']);
+
     // Look up and return the id of the Contact for this Contribution.
     $rows = T\CiviCRM::lookup($rows, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
