@@ -22,9 +22,6 @@ class ContributionsMatching {
       'Gift Amount',
       'Deductible amount',
       'Gift date',
-      'Deposit Date',
-      'Payment type',
-      'Check/Reference No.',
       'Vehicle Name',
     ]);
     // Rename the columns that will be imported to match CiviCRM fields.
@@ -38,9 +35,6 @@ class ContributionsMatching {
       'Gift Category' => 'Additional_Contribution_Data.Contribution_type:label',
       'Gift Amount' => 'total_amount',
       'Gift date' => 'receive_date',
-      'Deposit Date' => 'Additional_Contribution_Data.Deposited_Date',
-      'Payment type' => 'payment_instrument_id:label',
-      'Check/Reference No.' => 'check_number',
       'Vehicle Name' => 'vehicle_name',
     ]);
     // Get random sampe of rows to test. (REMOVE FOR FINAL VERSION)
@@ -90,7 +84,7 @@ class ContributionsMatching {
     $rows = $rowsWithDAF + $rowsWithNoVehicle;
 
     // Connect the matching Contribution.
-    $rows = T\CiviCRM::lookup($rows, 'Contirbution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'Additional_Contribution_Data.Matching_Contribution.id']);
 
     // Campaigns
