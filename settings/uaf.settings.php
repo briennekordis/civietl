@@ -209,6 +209,28 @@ $importSettings = [
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
   ],
+  'ContributionsMatching' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_matching_gifts.csv",
+      'data_primary_key' => 'LGL Gift ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Contribution',
+      'file_path' => "$workroot/data/tempConMatch.csv",
+      'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
+    ],
+  ],
+  'ContributionsMatchingFlip' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_matching_gifts.csv",
+      'data_primary_key' => 'LGL Gift ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Contribution',
+      'file_path' => "$workroot/data/tempConMatch.csv",
+      'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
+    ],
+  ],
   'ContributionsInKind' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/gift_in_kind.csv",
