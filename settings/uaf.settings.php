@@ -242,28 +242,6 @@ $importSettings = [
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
   ],
-  'ContributionNotes' => [
-    'readerOptions' => [
-      'file_path' => "$workroot/raw data/full_archive/gift_gifts.csv",
-      'data_primary_key' => '',
-    ],
-    'writerOptions' => [
-      'civi_primary_entity' => 'Note',
-      'file_path' => "$workroot/data/tempConNotes.csv",
-    ],
-    // 'writer_type' => 'CsvWriter',
-  ],
-  'ContributionsInKindNotes' => [
-    'readerOptions' => [
-      'file_path' => "$workroot/raw data/full_archive/gift_in_kind.csv",
-      'data_primary_key' => '',
-    ],
-    'writerOptions' => [
-      'civi_primary_entity' => 'Note',
-      'file_path' => "$workroot/data/tempConNotes.csv",
-    ],
-    // 'writer_type' => 'CsvWriter',
-  ],
   'SoftCredits' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/gift_soft_credits.csv",
@@ -292,6 +270,46 @@ $importSettings = [
     'writerOptions' => [
       'civi_primary_entity' => 'ContributionSoft',
       'file_path' => "$workroot/data/tempSCM.csv",
+    ],
+  ],
+  'ContributionNotes' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_gifts.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Note',
+      'file_path' => "$workroot/data/tempConNotes.csv",
+    ],
+  ],
+  'ContributionsInKindNotes' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_in_kind.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Note',
+      'file_path' => "$workroot/data/tempConNotes.csv",
+    ],
+  ],
+  'SoftCreditNotes' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_soft_credits.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Note',
+      'file_path' => "$workroot/data/tempSCNotes.csv",
+    ],
+  ],
+  'ContributionsMatchingNotes' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_matching_gifts.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Note',
+      'file_path' => "$workroot/data/tempCMNotes.csv",
     ],
   ],
   'RelationshipTypes' => [
