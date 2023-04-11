@@ -40,7 +40,7 @@ class Salutations {
     $rows = T\Cleanup::compareAndSet($rows, 'Addressee', 'addressee_custom', '');
     // Create seperate $rows variables based on the above comparison
     $rowsWithAltAddressee = T\RowFilters::filterBlanks($rows, 'addressee_custom');
-    $rowsWithoutAltAddressee = array_diff($rows, $rowsWithAltAddressee);
+    $rowsWithoutAltAddressee = array_diff_key($rows, $rowsWithAltAddressee);
     // Merge rows back together.
     $rows = $rowsWithoutAltAddressee + $rowsWithAltAddressee;
 
@@ -49,7 +49,7 @@ class Salutations {
     $rows = T\Cleanup::compareAndSet($rows, 'Salutation', 'email_greeting_custom', '');
     // Create seperate $rows variables based on the above comparison
     $rowsWithoutAltSalutation = T\RowFilters::filterBlanks($rows, 'email_greeting_custom');
-    $rowsWithAltSalutation = array_diff($rows, $rowsWithoutAltSalutation);
+    $rowsWithAltSalutation = array_diff_key($rows, $rowsWithoutAltSalutation);
     // Match the email greeting to the postal greeting.
     $rowsWithAltSalutation = T\Columns::copyColumn($rowsWithAltSalutation, 'email_greeting_custom', 'postal_greeting_custom');
     // Format the customized greetings with 'Dear '.
