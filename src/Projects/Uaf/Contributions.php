@@ -80,7 +80,7 @@ class Contributions {
     $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
     // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
-      return $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
+      return isset($row['contact_sub_type']) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
     });
     // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
     $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
