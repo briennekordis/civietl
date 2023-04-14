@@ -57,6 +57,8 @@ class Contributions {
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
     // Remap (i.e. clean up) Vehcile Name.
     $rows = T\ValueTransforms::valueMapper($rows, 'vehicle_name', ['2022-10-24 16:00:56 UTC' => 'Shell Oil Company Foundation']);
+    // Map empty 'Fund' to 'Unrestricted/ General Support'
+    $rows = T\ValueTransforms::valueMapper($rows, 'financial_type_id:label', ['' => 'Unrestricted/ General Support']);
     // Get the value needed for 'non_deductible_amount' from 'Deductible amount'.
     array_walk($rows, function(&$row) {
       $row['non_deductible_amount'] = $row['total_amount'] - $row['Deductible amount'];
