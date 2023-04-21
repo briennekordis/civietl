@@ -91,6 +91,10 @@ class Addresses {
         return $row['id'];
       });
       $rows = array_diff_key($rows, $completedRows);
+      // If we completed all our rows, just continue.
+      if (empty($rows)) {
+        break;
+      }
       $rows = T\Columns::deleteColumns($rows, ['id']);
     }
     $rows = T\Columns::newColumnWithConstant($rows, 'id', '');
@@ -122,6 +126,13 @@ class Addresses {
     '91436-4487' => 'United States',
     '70115' => 'United States',
     'Czechia' => 'Czech Republic',
+    'khyber pakhtunkhwa pakistan' => 'Pakistan',
+    'Delhi' => 'India',
+    'Kinsahsa' => 'CD',
+    'Basque Country' => '',
+    'Cypress' => '',
+    'Kurdistan' => '',
+    'Kashmir' => 'Pakistan',
   ];
 
   // We need a better system for these countries-as-states and vice versa..
@@ -129,6 +140,9 @@ class Addresses {
     'England' => '',
     'Scotland' => '',
     'Wales' => '',
+    'Россия' => '',
+    'россия' => '',
+    'Bayreuth' => '',
   ];
 
 }
