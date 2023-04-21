@@ -2,6 +2,7 @@
 $clientName = 'uaf';
 require_once "$clientName.settings.local.php";
 $GLOBALS['logFolder'] = "$workroot/errors";
+$GLOBALS['workroot'] = $workroot;
 $importDefaults = [
   'project_name' => 'Uaf',
   'reader_type' => 'CsvReader',
