@@ -108,7 +108,15 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'Address',
-      'file_path' => "$workroot/data/addresses.csv",
+    ],
+  ],
+  'FixedAddresses' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/Bad_Addresses FOR IMPORT gail corrected errors.csv",
+      'data_primary_key' => 'LGL Address ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Address',
     ],
   ],
   'Notes' => [
