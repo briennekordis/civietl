@@ -6,6 +6,14 @@ use Civietl\Transforms as T;
 class Addresses {
 
   public function transforms(array $rows) : array {
+    // Introduce a second set of rows, those manually fixed by Gail.
+    $manuallyFixedCsv = new \Civietl\Reader\CsvReader([
+      'file_path' => $GLOBALS['workroot'] . '/raw data/Bad_Addresses FOR IMPORT gail corrected errors.csv',
+      'data_primary_key' => 'LGL Address ID',
+    ]);
+    $manuallyFixedRows = $manuallyFixedCsv->getRows();
+    // Remove rows in the original addresses that are in Gail's group.
+    $rows = T\Joins::removeRowsInBoth($rows, $manuallyFixedRows, 'LGL Constituent ID', 'LGL Constituent ID');
     // Get Contact ID.
     $rows = T\CiviCRM::lookup($rows, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, [
