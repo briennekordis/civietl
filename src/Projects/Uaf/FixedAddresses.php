@@ -3,44 +3,13 @@ namespace Civietl\Projects\Uaf;
 
 use Civietl\Transforms as T;
 
-class Addresses {
+class FixedAddresses {
 
   public function transforms(array $rows) : array {
-    // Introduce a second set of rows, those manually fixed by Gail.
-    $manuallyFixedCsv = new \Civietl\Reader\CsvReader([
-      'file_path' => $GLOBALS['workroot'] . '/raw data/Bad_Addresses FOR IMPORT gail corrected errors.csv',
-      'data_primary_key' => 'LGL Address ID',
-    ]);
-    $manuallyFixedRows = $manuallyFixedCsv->getRows();
-    // Remove rows in the original addresses that are in Gail's group.
-    $rows = T\Joins::removeRowsInBoth($rows, $manuallyFixedRows, 'LGL Constituent ID', 'LGL Constituent ID');
-    // Get Contact ID.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['id']);
-    $rows = T\Columns::renameColumns($rows, [
-      'id' => 'contact_id',
-      'Address Type' => 'location_type_id:label',
-      'City' => 'city',
-      'Postal Code/ZIP' => 'postal_code',
-      'Is Preferred?' => 'is_primary',
-    ]);
-    // Split Address into two fields when there's a carriage return.
-    $rows = T\Transform::splitFieldToFields($rows, 'Street', "\n");
-    $rows = T\Columns::renameColumns($rows, [
-      'Street_0' => 'street_address',
-      'Street_1' => 'supplemental_address_1',
-      'Street_2' => 'supplemental_address_2',
-      'Street_3' => 'supplemental_address_3',
-    ]);
-    $rows = T\Columns::deleteColumns($rows, ['Constituent Name', 'LGL Address ID', 'County', 'Seasonal from', 'Seasonal to', 'Is Valid?', 'Street']);
-
-    // CLEANUP
-    // Trim every field.
-    $rows = T\Text::trim($rows, array_keys(reset($rows)));
-    // Move obvious states to countries.
-    $rows = T\Cleanup::moveStatesToCountries($rows, 'State', 'Country');
+    $rows = T\Columns::deleteColumns($rows, ['Bad_Addresses', 'country_id', 'state_province_id', 'errors ']);
     // Clean up and map countries. First the ones that are special to this data, then all the rest.
-    $rows = T\ValueTransforms::valueMapper($rows, 'Country', \Civietl\Maps::COUNTRY_MAP + self::UAF_COUNTRY_MAP, NULL, FALSE);
-    $rows = T\ValueTransforms::valueMapper($rows, 'State', \Civietl\Maps::STATE_MAP + self::UAF_STATE_MAP, NULL, FALSE);
+    $rows = T\ValueTransforms::valueMapper($rows, 'Country', \Civietl\Maps::COUNTRY_MAP + Addresses::UAF_COUNTRY_MAP, NULL, FALSE);
+    $rows = T\ValueTransforms::valueMapper($rows, 'State', \Civietl\Maps::STATE_MAP + Addresses::UAF_STATE_MAP, NULL, FALSE);
 
     // COUNTRY LOOKUPS
     // $completedCoutryRows is first records with no country, then adding lookups by ISO code, then lookups by name.
@@ -126,13 +95,6 @@ class Addresses {
     '91436-4487' => 'United States',
     '70115' => 'United States',
     'Czechia' => 'Czech Republic',
-    'khyber pakhtunkhwa pakistan' => 'Pakistan',
-    'Delhi' => 'India',
-    'Kinsahsa' => 'CD',
-    'Basque Country' => '',
-    'Cypress' => '',
-    'Kurdistan' => '',
-    'Kashmir' => 'Pakistan',
   ];
 
   // We need a better system for these countries-as-states and vice versa..
@@ -140,9 +102,6 @@ class Addresses {
     'England' => '',
     'Scotland' => '',
     'Wales' => '',
-    'Россия' => '',
-    'россия' => '',
-    'Bayreuth' => '',
   ];
 
 }

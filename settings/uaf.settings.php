@@ -2,6 +2,7 @@
 $clientName = 'uaf';
 require_once "$clientName.settings.local.php";
 $GLOBALS['logFolder'] = "$workroot/errors";
+$GLOBALS['workroot'] = $workroot;
 $importDefaults = [
   'project_name' => 'Uaf',
   'reader_type' => 'CsvReader',
@@ -107,7 +108,15 @@ $importSettings = [
     ],
     'writerOptions' => [
       'civi_primary_entity' => 'Address',
-      'file_path' => "$workroot/data/addresses.csv",
+    ],
+  ],
+  'FixedAddresses' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/Bad_Addresses FOR IMPORT gail corrected errors.csv",
+      'data_primary_key' => 'LGL Address ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Address',
     ],
   ],
   'Notes' => [

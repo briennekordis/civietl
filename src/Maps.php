@@ -147,7 +147,7 @@ class Maps {
     'Korea, North' => 'Korea, Democratic People\'s Republic of',
     'Korea, South' => 'Korea, Republic of',
     'Laos' => 'Lao People\'s Democratic Republic',
-    'Macedonia' => 'Macedonia, Republic Of',
+    'Macedonia' => 'MK',
     'Mexico D.F.' => 'Mexico',
     'Mexico DF' => 'Mexico',
     'Mexico, D.F.' => 'Mexico',
@@ -219,6 +219,19 @@ class Maps {
     'N/A' => '',
     'unknown' => '',
     'Country' => '',
+    'Cote d\'Ivoire' => 'Côte d’Ivoire',
+    'DRC' => 'CD',
+    'DRCongo' => 'CD',
+    'Bangaldesh' => 'Bangladesh',
+    'Macedonia, Republic Of' => 'MK',
+    'Lagos' => 'Nigeria',
+    'Lisbon' => 'Portugal',
+    'RSA' => 'South Africa',
+    'UAE' => 'United Arab Emirates',
+    'New Delhi' => 'India',
+    'Khyber Pakhtunkhwa' => 'Pakistan',
+    'Khyber' => 'Pakistan',
+    'Grenade' => 'Grenada',
   ];
 
   const STATE_MAP = [
