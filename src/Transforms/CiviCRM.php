@@ -2,6 +2,7 @@
 namespace Civietl\Transforms;
 
 use Civietl\Logging;
+use Civietl\Transforms as T;
 
 class CiviCRM {
 
@@ -56,8 +57,20 @@ class CiviCRM {
   }
 
   /**
+   * Helper function for option value lookups.
+   */
+  public static function OptionValuelookup(array $rows, string $optionGroup, array $lookupFields, array $returnFields, bool $logErrors = TRUE) : array {
+    $rows = T\Columns::newColumnWithConstant($rows, 'temp_column', $optionGroup);
+    $lookupFields += ['temp_column' => 'option_group_id:name'];
+    $rows = T\CiviCRM::lookup($rows, 'OptionValue', $lookupFields, $returnFields, $logErrors);
+    $rows = T\Columns::deleteColumns($rows, ['temp_column']);
+    return $rows;
+  }
+
+  /**
    * Return one or more fields from a record based on an existing value(s).
    * E.g. from external_identifier, return the contact_id.
+   * Example: $rows = T\CiviCRM::lookup($rows, 'Contact', ['external_identifier' => 'external_identifier'], ['id']);
    */
   public static function lookup(array $rows, string $entity, array $lookupFields, array $returnFields, bool $logErrors = TRUE) : array {
     $logger = new Logging($entity);
