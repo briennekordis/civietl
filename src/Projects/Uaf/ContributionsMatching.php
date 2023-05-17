@@ -47,7 +47,15 @@ class ContributionsMatching {
     // Remap 'Donation' to 'Direct Donation' for Contribution type.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
     // Remap 'Matching' to 'Matching Gift' for Contribution type.
-    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Matching' => 'DMatching Gift']);
+    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Matching' => 'Matching Gift']);
+    // Remap null to '' for Contribution type.
+    $rowsWithCategory = T\RowFilters::filterBlanks($rows, 'Additional_Contribution_Data.Contribution_type:label');
+    $rowsWithNoCategory = array_diff_key($rows, $rowsWithCategory);
+    if ($rowsWithNoCategory) {
+      $rowsWithNoCategory = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['' => 'Uncategorized']);
+    }
+    // Merge the two types of rows back into one.
+    $rows = $rowsWithCategory + $rowsWithNoCategory;
     // Get the value needed for 'non_deductible_amount' from 'Deductible amount'.
     array_walk($rows, function(&$row) {
       $row['non_deductible_amount'] = $row['total_amount'] - $row['Deductible amount'];
@@ -77,7 +85,8 @@ class ContributionsMatching {
 
     // Connect the matching Contribution.
     $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
-    $rows = T\Columns::renameColumns($rows, ['id' => 'Additional_Contribution_Data.Matching_Contribution.id']);
+    // Need to assign this differently with the Matching Contributions exension?
+    $rows = T\Columns::renameColumns($rows, ['id' => 'gift_details.matching_gift']);
 
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
