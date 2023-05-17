@@ -56,7 +56,14 @@ class Contributions {
     // Remap 'Donation' to 'Direct Donation' for Contribution type.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
     // Remap null to '' for Contribution type.
-    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', [NULL => '']);
+    $rowsWithCategory = T\RowFilters::filterBlanks($rows, 'Additional_Contribution_Data.Contribution_type:label');
+    $rowsWithNoCategory = array_diff_key($rows, $rowsWithCategory);
+    if ($rowsWithNoCategory) {
+      $rowsWithNoCategory = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['' => 'Uncategorized']);
+    }
+    // Merge the two types of rows back into one.
+    $rows = $rowsWithCategory + $rowsWithNoCategory;
+
     // Remap (i.e. clean up) Vehcile Name.
     $rows = T\ValueTransforms::valueMapper($rows, 'vehicle_name', ['2022-10-24 16:00:56 UTC' => 'Shell Oil Company Foundation']);
     // Map empty 'Fund' to 'Unrestricted/ General Support'
@@ -81,7 +88,9 @@ class Contributions {
     $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_name');
     $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
     // Look up the Contact Subtype of rows with a Vehicle.
-    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
+    if ($rowsWithVehicle) {
+      $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
+    }
     // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
       return isset($row['contact_sub_type']) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
@@ -89,8 +98,10 @@ class Contributions {
     // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
     $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
     // Assign a Donor Advisor for DAF Contributions.
-    $rowsWithDAF = T\CiviCRM::lookup($rowsWithDAF, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
-    $rowsWithDAF = T\Columns::renameColumns($rowsWithDAF, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
+    if ($rowsWithDAF) {
+      $rowsWithDAF = T\CiviCRM::lookup($rowsWithDAF, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
+      $rowsWithDAF = T\Columns::renameColumns($rowsWithDAF, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);  
+    }
     // Merge the two types of rows back into one.
     $rows = $rowsWithDAF + $rowsWithNoVehicle;
 
