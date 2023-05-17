@@ -64,16 +64,16 @@ $importSettings = [
       'civi_primary_entity' => 'Contact',
     ],
   ],
-  'Salutations' => [
-    'readerOptions' => [
-      'file_path' => "$workroot/raw data/full_archive/constituents.csv",
-      'data_primary_key' => 'LGL Constituent ID',
-    ],
-    'writerOptions' => [
-      'file_path' => "$workroot/data/contacts.csv",
-      'civi_primary_entity' => 'Contact',
-    ],
-  ],
+  // 'Salutations' => [
+  //   'readerOptions' => [
+  //     'file_path' => "$workroot/raw data/full_archive/constituents.csv",
+  //     'data_primary_key' => 'LGL Constituent ID',
+  //   ],
+  //   'writerOptions' => [
+  //     'file_path' => "$workroot/data/contacts.csv",
+  //     'civi_primary_entity' => 'Contact',
+  //   ],
+  // ],
   'Websites' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/websites.csv",
@@ -235,7 +235,7 @@ $importSettings = [
       'data_primary_key' => 'LGL Gift ID',
     ],
     'writerOptions' => [
-      'civi_primary_entity' => 'Contribution',
+      'civi_primary_entity' => 'ContributionSoft',
       'file_path' => "$workroot/data/tempConMatch.csv",
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
