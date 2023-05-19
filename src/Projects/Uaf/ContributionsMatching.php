@@ -81,12 +81,8 @@ class ContributionsMatching {
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
       return isset($row['contact_sub_type'][0]) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
     });
-    $rows = $rowsWithNoVehicle;
-
-    // Connect the matching Contribution.
-    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
-    // Need to assign this differently with the Matching Contributions exension?
-    $rows = T\Columns::renameColumns($rows, ['id' => 'gift_details.matching_gift']);
+    $rowsWithoutThirdParty = array_diff_key($rows, $rowsWithThirdParty);
+    $rows = $rowsWithNoVehicle + $rowsWithoutThirdParty;
 
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
