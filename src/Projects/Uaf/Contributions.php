@@ -100,7 +100,7 @@ class Contributions {
     // Assign a Donor Advisor for DAF Contributions.
     if ($rowsWithDAF) {
       $rowsWithDAF = T\CiviCRM::lookup($rowsWithDAF, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
-      $rowsWithDAF = T\Columns::renameColumns($rowsWithDAF, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);  
+      $rowsWithDAF = T\Columns::renameColumns($rowsWithDAF, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
     }
     // Merge the two types of rows back into one.
     $rows = $rowsWithDAF + $rowsWithNoVehicle;
