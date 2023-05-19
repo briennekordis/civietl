@@ -21,14 +21,17 @@ class ContributionsMatchingFlip {
     // Rename the columns that will be imported to match CiviCRM fields.
     $rows = T\Columns::renameColumns($rows, [
       'Gift Amount' => 'total_amount',
+      'Vehicle Name' => 'vehicle_name',
     ]);
 
-    // Filter out Contributions with Vehciles since they are all Third Party Giving Contributions.
-    // Split rows into those with a Vehicle and those without.
-    $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'Vehicle Name');
+    // Look up and return the external_identifier of the Vehicle.
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['vehicle_name' => 'organization_name'], ['external_identifier']);
+    $rows = T\Columns::renameColumns($rows, ['external_identifier' => 'vehicle_external_identifier']);
+    // Filter out Contributions with Vehicles since they are all Third Party Giving Contributions. Split rows into those with a Vehicle and those without.
+    $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_external_identifier');
     $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
     // Only import those without a Vehicle (Third Party Giving Contribution).
-    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
+    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['contact_sub_type']);
     // // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
       return isset($row['contact_sub_type'][0]) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
@@ -52,7 +55,7 @@ class ContributionsMatchingFlip {
     $rows = T\Columns::renameColumns($rows, ['contact_id' => 'gift_details.matching_gift']);
 
     // Connect the matching Contribution, to apply the Soft Credit.
-    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id', 'contact_id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contribution_id']);
 
     return $rows;

@@ -36,7 +36,7 @@ class AutoMatchingGift {
     $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
     // Only import those without a Vehicle (Third Party Giving Contribution).
     if ($rowsWithVehicle) {
-      $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
+      $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['id' => 'id'], ['contact_sub_type']);
     }
     // // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
@@ -47,7 +47,6 @@ class AutoMatchingGift {
     // Connect the matching Contribution, to assign the Contact of this Contribution as the Matching Gift Organization
     $rows = T\Columns::renameColumns($rows, ['id' => 'gift_details.matching_gift']);
     $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
-    $rows = T\CiviCRM::lookup($rows, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
 
     return $rows;
   }
