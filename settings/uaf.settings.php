@@ -239,6 +239,19 @@ $importSettings = [
       'file_path' => "$workroot/data/tempConMatch.csv",
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
+    // 'writer_type' => 'CsvWriter',
+  ],
+  'AutoMatchingGift' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_matching_gifts.csv",
+      'data_primary_key' => 'LGL Gift ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Contribution',
+      'file_path' => "$workroot/data/tempAutoMatch.csv",
+      'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
+    ],
+    // 'writer_type' => 'CsvWriter',
   ],
   'ContributionsInKind' => [
     'readerOptions' => [
