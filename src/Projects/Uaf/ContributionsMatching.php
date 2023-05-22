@@ -76,7 +76,9 @@ class ContributionsMatching {
     $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_name');
     $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
     // Look up the Contact Subtype of rows with a Vehicle.
-    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
+    if ($rowsWithVehicle) {
+      $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
+    }
     // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
       return isset($row['contact_sub_type'][0]) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';

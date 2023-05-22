@@ -104,6 +104,7 @@ class Contributions {
     }
     // Merge the two types of rows back into one.
     $rows = $rowsWithDAF + $rowsWithNoVehicle;
+    // $rows = T\Columns::deleteColumns($rows, ['contact_sub_type']);
 
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.

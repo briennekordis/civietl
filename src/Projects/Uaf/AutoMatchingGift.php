@@ -47,6 +47,7 @@ class AutoMatchingGift {
     // Connect the matching Contribution, to assign the Contact of this Contribution as the Matching Gift Organization
     $rows = T\Columns::renameColumns($rows, ['id' => 'gift_details.matching_gift']);
     $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
+    $rows = T\Columns::deleteAllColumnsExcept($rows, ['gift_details.matching_gift', 'id']);
 
     return $rows;
   }

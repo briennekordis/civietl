@@ -31,7 +31,9 @@ class ContributionsMatchingFlip {
     $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_external_identifier');
     $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
     // Only import those without a Vehicle (Third Party Giving Contribution).
-    $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['contact_sub_type']);
+    if ($rowsWithVehicle) {
+      $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['contact_sub_type']);
+    }
     // // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
       return isset($row['contact_sub_type'][0]) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
