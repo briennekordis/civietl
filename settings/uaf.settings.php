@@ -147,6 +147,11 @@ $importSettings = [
       'match_fields' => ['name'],
     ],
   ],
+  // 'FTSnapshot' => [
+  //   'writerOptions' => [
+  //     'filename' => "$workroot/data/ftdump.sql"
+  //   ]
+  // ]
   'OptionGroups' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/optionGroups.csv",
@@ -239,7 +244,6 @@ $importSettings = [
       'file_path' => "$workroot/data/tempConMatch.csv",
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
-    // 'writer_type' => 'CsvWriter',
   ],
   'AutoMatchingGift' => [
     'readerOptions' => [

@@ -20,10 +20,20 @@ class ContributionsMatchingFlip {
 
     // Rename the columns that will be imported to match CiviCRM fields.
     $rows = T\Columns::renameColumns($rows, [
-      'Gift Amount' => 'total_amount',
+      'Gift Amount' => 'amount',
       'Vehicle Name' => 'vehicle_name',
     ]);
-
+    // Load a list of gift IDs we're not importing, and rekey to the LGL Gift ID.
+    $giftsNotImportedReader = new \Civietl\Reader\CsvReader([
+      'file_path' => $GLOBALS['workroot'] . '/data/gifts_not_imported.csv',
+      'data_primary_key' => 'LGL Gift ID',
+    ]);
+    $giftsNotImported = $giftsNotImportedReader->getRows();
+    $giftsNotImported = array_combine(array_column($giftsNotImported, 'LGL_Gift_ID'), $giftsNotImported);
+    // Rekey the actual rows to the *parent's* LGL Gift ID.
+    $rows = array_combine(array_column($rows, 'LGL Parent Gift ID'), $rows);
+    // Remove contributions not imported from $rows.
+    $rows = array_diff_key($rows, $giftsNotImported);
     // Look up and return the external_identifier of the Vehicle.
     $rows = T\CiviCRM::lookup($rows, 'Contact', ['vehicle_name' => 'organization_name'], ['external_identifier']);
     $rows = T\Columns::renameColumns($rows, ['external_identifier' => 'vehicle_external_identifier']);
@@ -57,9 +67,10 @@ class ContributionsMatchingFlip {
     $rows = T\Columns::renameColumns($rows, ['contact_id' => 'gift_details.matching_gift']);
 
     // Connect the matching Contribution, to apply the Soft Credit.
-    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['contact_id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contribution_id']);
-
+    $rows = T\Columns::deleteAllColumnsExcept($rows, ['contribution_id', 'contact_id', 'amount']);
     return $rows;
   }
 

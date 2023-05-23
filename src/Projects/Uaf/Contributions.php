@@ -97,6 +97,10 @@ class Contributions {
     });
     // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
     $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
+    $rowsWithThirdParty = T\Columns::deleteAllColumnsExcept($rowsWithThirdParty, ['Legacy_Contribution_Data.LGL_Gift_ID']);
+    $rowsWithThirdParty = T\Columns::renameColumns($rowsWithThirdParty, ['Legacy_Contribution_Data.LGL_Gift_ID' => 'LGL_Gift_ID']);
+    $thirdPartyWriter = new \Civietl\Writer\CsvWriter(['file_path' => $GLOBALS['workroot'] . '/data/gifts_not_imported.csv']);
+    $thirdPartyWriter->writeAll($rowsWithThirdParty);
     // Assign a Donor Advisor for DAF Contributions.
     if ($rowsWithDAF) {
       $rowsWithDAF = T\CiviCRM::lookup($rowsWithDAF, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
@@ -104,7 +108,7 @@ class Contributions {
     }
     // Merge the two types of rows back into one.
     $rows = $rowsWithDAF + $rowsWithNoVehicle;
-    // $rows = T\Columns::deleteColumns($rows, ['contact_sub_type']);
+    $rows = T\Columns::deleteColumns($rows, ['contact_sub_type']);
 
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
