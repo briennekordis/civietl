@@ -45,24 +45,25 @@ class Utils {
     $firstStep = $lastStep = $cliArguments['run-only'] ?? NULL;
     $firstStep ??= $cliArguments['start-from'] ?? NULL;
     $lastStep ??= $cliArguments['end-on'] ?? NULL;
-    if (!$firstStep) {
-      return $importSettings;
-    }
     // First step.
-    foreach ($importSettings as $stepName => $dontcare) {
-      if ($firstStep === $stepName) {
-        break;
-      }
-      unset($importSettings[$stepName]);
-    }
-    // Last step.
-    $pastLastStep = FALSE;
-    foreach ($importSettings as $stepName => $dontcare) {
-      if ($pastLastStep) {
+    if ($firstStep) {
+      foreach ($importSettings as $stepName => $dontcare) {
+        if ($firstStep === $stepName) {
+          break;
+        }
         unset($importSettings[$stepName]);
       }
-      if ($lastStep === $stepName) {
-        $pastLastStep = TRUE;
+    }
+    // Last step.
+    if ($lastStep) {
+      $pastLastStep = FALSE;
+      foreach ($importSettings as $stepName => $dontcare) {
+        if ($pastLastStep) {
+          unset($importSettings[$stepName]);
+        }
+        if ($lastStep === $stepName) {
+          $pastLastStep = TRUE;
+        }
       }
     }
     return $importSettings;
