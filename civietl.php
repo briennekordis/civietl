@@ -32,10 +32,11 @@ foreach ($importSettings as $stepName => $importSetting) {
   $reader = new ReaderService(new $readerClassName($importSetting['readerOptions']));
   // $cache = new CacheService(new $cacheClassName($importSetting['data_primary_key']));
   $step = new $clientClassName();
-
-  $rows = $reader->getRows();
-
-  $rows = $step->transforms($rows);
+  $rows = [];
+  if ($reader) {
+    $rows = $reader->getRows();
+    $rows = $step->transforms($rows);
+  }
 
   $writer = new WriterService(new $writerClassName($importSetting['writerOptions']));
   $writer->writeAll($rows);
