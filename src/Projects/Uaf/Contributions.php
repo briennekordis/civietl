@@ -52,7 +52,7 @@ class Contributions {
     // Add a column that gives these Contributions a 'Completed' status.
     $rows = T\Columns::newColumnWithConstant($rows, 'contribution_status_id:label', 'Completed');
     // Remap true to 1 and false to 0 for Anonymous gift.
-    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['FALSE' => 0, 'TRUE' => 1]);
+    $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Anonymous_gift', ['FALSE' => 0, 'TRUE' => '1']);
     // Remap 'Donation' to 'Direct Donation' for Contribution type.
     $rows = T\ValueTransforms::valueMapper($rows, 'Additional_Contribution_Data.Contribution_type:label', ['Donation' => 'Direct Donation']);
     // Remap null to '' for Contribution type.
