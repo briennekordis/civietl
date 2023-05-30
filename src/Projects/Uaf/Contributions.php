@@ -97,14 +97,30 @@ class Contributions {
     });
     // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
     $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
-    $rowsWithThirdParty = T\Columns::deleteAllColumnsExcept($rowsWithThirdParty, ['Legacy_Contribution_Data.LGL_Gift_ID']);
-    $rowsWithThirdParty = T\Columns::renameColumns($rowsWithThirdParty, ['Legacy_Contribution_Data.LGL_Gift_ID' => 'LGL_Gift_ID']);
-    $thirdPartyWriter = new \Civietl\Writer\CsvWriter(['file_path' => $GLOBALS['workroot'] . '/data/gifts_not_imported.csv']);
-    $thirdPartyWriter->writeAll($rowsWithThirdParty);
-    // Assign a Donor Advisor for DAF Contributions.
+    if ($rowsWithThirdParty) {
+      $rowsWithThirdParty = T\Columns::deleteAllColumnsExcept($rowsWithThirdParty, ['Legacy_Contribution_Data.LGL_Gift_ID']);
+      $rowsWithThirdParty = T\Columns::renameColumns($rowsWithThirdParty, ['Legacy_Contribution_Data.LGL_Gift_ID' => 'LGL_Gift_ID']);
+      $thirdPartyWriter = new \Civietl\Writer\CsvWriter(['file_path' => $GLOBALS['workroot'] . '/data/gifts_not_imported.csv']);
+      $thirdPartyWriter->writeAll($rowsWithThirdParty);
+    }
+    // Assign a Donor Advisor for DAF Contributions if the Contact is an Individual or a Donor Advised Fund if the Contact is an Organization.
     if ($rowsWithDAF) {
-      $rowsWithDAF = T\CiviCRM::lookup($rowsWithDAF, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
-      $rowsWithDAF = T\Columns::renameColumns($rowsWithDAF, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
+      $rowsWithDAF = T\Columns::newColumnWithConstant($rowsWithDAF, 'Donor_Advised_Fund.Donor_Advisor', '');
+      $rowsWithDAF = T\Columns::newColumnWithConstant($rowsWithDAF, 'Donor_Advised_Fund.Donor_Advised_Fund', '');
+      $rowsWithDAF = T\CiviCRM::lookup($rowsWithDAF, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['contact_type', 'id']);
+      $rowsWithDAFIndividual = array_filter($rowsWithDAF, function($row) {
+        return isset($row['contact_type']) && $row['contact_type'] === 'Individual';
+      });
+      $rowsWithDAFOrganization = array_filter($rowsWithDAF, function($row) {
+        return isset($row['contact_type']) && $row['contact_type'] === 'Organization';
+      });
+      if ($rowsWithDAFIndividual) {
+        $rowsWithDAFIndividual = T\Columns::renameColumns($rowsWithDAFIndividual, ['id' => 'Donor_Advised_Fund.Donor_Advisor']);
+      }
+      if ($rowsWithDAFOrganization) {
+        $rowsWithDAFOrganization = T\Columns::renameColumns($rowsWithDAFOrganization, ['id' => 'Donor_Advised_Fund.Donor_Advised_Fund']);
+      }
+      $rowsWithDAF = $rowsWithDAFIndividual + $rowsWithDAFOrganization;
     }
     // Merge the two types of rows back into one.
     $rows = $rowsWithDAF + $rowsWithNoVehicle;
