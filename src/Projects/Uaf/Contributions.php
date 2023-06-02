@@ -47,7 +47,7 @@ class Contributions {
 
     // Cleanup
     // Remap '' to 'Unkown' for payment_instrument.
-    $rows = T\ValueTransforms::valueMapper($rows, 'payment_instrument_id:label', ['' => 'Unkown']);
+    $rows = T\ValueTransforms::valueMapper($rows, 'payment_instrument_id:label', ['' => 'Unknown']);
     // Create any missing payment methods in the OptionValues table.
     $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
     T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
