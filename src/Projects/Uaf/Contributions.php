@@ -46,7 +46,7 @@ class Contributions {
     // $rows = T\RowFilters::randomSample($rows, 50);
 
     // Cleanup
-    // Remap '' to 'Unkown' for payment_instrument.
+    // Remap blanks to 'Unknown' for payment instrument.
     $rows = T\ValueTransforms::valueMapper($rows, 'payment_instrument_id:label', ['' => 'Unknown']);
     // Create any missing payment methods in the OptionValues table.
     $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
