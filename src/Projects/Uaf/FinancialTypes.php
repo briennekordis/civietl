@@ -22,7 +22,7 @@ class FinancialTypes {
       'Is Active?' => 'is_active',
     ]);
     // Remap TRUE to 1 and FALSE to 0 for is_active.
-    $rows = T\ValueTransforms::valueMapper($rows, 'is_active', ['FALSE' => 0, 'TRUE' => 1]);
+    $rows = T\ValueTransforms::valueMapper($rows, 'is_active', ['false' => 0, 'true' => 1]);
     return $rows;
   }
 
