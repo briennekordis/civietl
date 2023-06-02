@@ -46,11 +46,11 @@ class Contributions {
     // $rows = T\RowFilters::randomSample($rows, 50);
 
     // Cleanup
+    // Remap '' to 'Unkown' for payment_instrument.
+    $rows = T\ValueTransforms::valueMapper($rows, 'payment_instrument_id:label', ['' => 'Unkown']);
     // Create any missing payment methods in the OptionValues table.
     $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
     T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
-    // Remap '' to 'Unkown' for payment_instrument.
-    $rows = T\ValueTransforms::valueMapper($rows, 'payment_instrument', ['' => 'Unkown']);
     // Add a column that gives these Contributions a 'Completed' status.
     $rows = T\Columns::newColumnWithConstant($rows, 'contribution_status_id:label', 'Completed');
     // Remap true to 1 and false to 0 for Anonymous gift.
