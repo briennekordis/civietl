@@ -39,9 +39,9 @@ class ContributionsMatching {
     // $rows = T\RowFilters::randomSample($rows, 50);
 
     // Cleanup
-    // Create any missing payment methods in the OptionValues table.
-    $paymentMethods = T\RowFilters::getUniqueValues($rows, 'payment_instrument_id:label');
-    T\CiviCRM::createOptionValues('payment_instrument', $paymentMethods);
+    // Add a column that gives these Contributions a payment method.
+    $rows = T\Columns::newColumnWithConstant($rows, 'payment_instrument_id:label', 'Verify in LGL');
+    T\CiviCRM::createOptionValues('payment_instrument', ['Verify in LGL']);
     // Add a column that gives these Contributions a 'Completed' status.
     $rows = T\Columns::newColumnWithConstant($rows, 'contribution_status_id:label', 'Completed');
     // Remap 'Donation' to 'Direct Donation' for Contribution type.
