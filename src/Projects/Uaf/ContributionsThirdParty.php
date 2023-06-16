@@ -79,12 +79,12 @@ class ContributionsThirdParty {
 
     // Contacts
     // Look up and return the id of the Contact this Contribution is connected to.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
-    $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
+    $rowsToImport = T\CiviCRM::lookup($rowsToImport, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
+    $rowsToImport = T\Columns::renameColumns($rowsToImport, ['id' => 'contact_id']);
     // Look up and return the id of the Vehicle.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', ['vehicle_name' => 'organization_name'], ['id']);
+    $rowsToImport = T\CiviCRM::lookup($rowsToImport, 'Contact', ['vehicle_name' => 'organization_name'], ['id']);
     // Assign the Vehicle to the Third Party Giving Vehicle custom field.
-    $rows = T\Columns::renameColumns($rows, ['id' => 'Additional_Contribution_Data.Third_Party_Giving_Vehicle']);
+    $rowsToImport = T\Columns::renameColumns($rowsToImport, ['id' => 'Additional_Contribution_Data.Third_Party_Giving_Vehicle']);
 
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
