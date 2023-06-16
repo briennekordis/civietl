@@ -223,6 +223,17 @@ $importSettings = [
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
   ],
+  'ContributionsThirdParty' [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_gifts.csv",
+      'data_primary_key' => 'LGL Gift ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Contribution',
+      'file_path' => "$workroot/data/tempCon3.csv",
+      'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
+    ],
+  ],
   'ContributionsMatching' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/gift_matching_gifts.csv",
