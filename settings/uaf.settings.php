@@ -222,7 +222,6 @@ $importSettings = [
       'file_path' => "$workroot/data/tempCon.csv",
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
-    'writer_type' => 'CsvWriter',
   ],
   'ContributionsThirdParty' => [
     'readerOptions' => [
@@ -234,7 +233,6 @@ $importSettings = [
       'file_path' => "$workroot/data/tempCon3.csv",
       'match_fields' => ['Legacy_Contribution_Data.LGL_Gift_ID'],
     ],
-    'writer_type' => 'CsvWriter',
   ],
 
   'ContributionsMatching' => [
