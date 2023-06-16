@@ -376,4 +376,14 @@ $importSettings = [
       'civi_primary_entity' => 'Relationship',
     ],
   ],
+  'Attachments' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/documents.csv",
+      'data_primary_key' => '',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'Attachment',
+    ],
+    'writer_type' => 'CiviCrmApi3',
+  ]
 ];
