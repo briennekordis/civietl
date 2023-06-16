@@ -11,38 +11,38 @@ class ContributionsThirdParty {
   public function transforms(array $rows) : array {
     // Remove columns that will not be imported.
     $rows = T\Columns::deleteAllColumnsExcept($rows, [
-        'LGL Constituent ID',
-        'LGL Gift ID',
-        'LGL Campaign ID',
-        'Fund',
-        'LGL Appeal ID',
-        'Gift Category',
-        'Gift Amount',
-        'Deductible amount',
-        'Gift date',
-        'Deposit Date',
-        'Payment type',
-        'Check/Reference No.',
-        'Anonymous gift?',
-        'Vehicle Name',
-        ]);
-        // Rename the columns that will be imported to match CiviCRM fields.
-        $rows = T\Columns::renameColumns($rows, [
-        'LGL Constituent ID' => 'contact_external_identifier',
-        'LGL Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID',
-        'LGL Campaign ID' => 'campaign_external_identifier',
-        'Fund' => 'financial_type_id:label',
-        'LGL Appeal ID' => 'appeal_external_identifier',
-        'Gift Category' => 'Additional_Contribution_Data.Contribution_type:label',
-        'Gift Amount' => 'total_amount',
-        'Gift date' => 'receive_date',
-        'Deposit Date' => 'Additional_Contribution_Data.Deposited_Date',
-        'Payment type' => 'payment_instrument_id:label',
-        'Check/Reference No.' => 'check_number',
-        'Anonymous gift?' => 'Additional_Contribution_Data.Anonymous_gift',
-        'Vehicle Name' => 'vehicle_name',
-        ]);
-    
+      'LGL Constituent ID',
+      'LGL Gift ID',
+      'LGL Campaign ID',
+      'Fund',
+      'LGL Appeal ID',
+      'Gift Category',
+      'Gift Amount',
+      'Deductible amount',
+      'Gift date',
+      'Deposit Date',
+      'Payment type',
+      'Check/Reference No.',
+      'Anonymous gift?',
+      'Vehicle Name',
+    ]);
+    // Rename the columns that will be imported to match CiviCRM fields.
+    $rows = T\Columns::renameColumns($rows, [
+      'LGL Constituent ID' => 'contact_external_identifier',
+      'LGL Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID',
+      'LGL Campaign ID' => 'campaign_external_identifier',
+      'Fund' => 'financial_type_id:label',
+      'LGL Appeal ID' => 'appeal_external_identifier',
+      'Gift Category' => 'Additional_Contribution_Data.Contribution_type:label',
+      'Gift Amount' => 'total_amount',
+      'Gift date' => 'receive_date',
+      'Deposit Date' => 'Additional_Contribution_Data.Deposited_Date',
+      'Payment type' => 'payment_instrument_id:label',
+      'Check/Reference No.' => 'check_number',
+      'Anonymous gift?' => 'Additional_Contribution_Data.Anonymous_gift',
+      'Vehicle Name' => 'vehicle_name',
+    ]);
+
     // Look up the LGL Gift ID. If it exsists in CiviCRM already, do not import.
     $rows = T\CiviCRM::lookup($rows, 'Contribution', ['Legacy_Contribution_Data.LGL_Gift_ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
     $rowsAlreadyImported = T\RowFilters::filterBlanks($rows, 'id');
