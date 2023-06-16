@@ -49,6 +49,8 @@ class ContributionsThirdParty {
     $rowsToImport = array_diff_key($rows, $rowsAlreadyImported);
 
     // Cleanup
+    // Remove the id field, since we are creating new Contributions.
+    $rowsToImport = T\Columns::deleteColumns($rowsToImport, ['id']);
     // Remap blanks to 'Unknown' for payment instrument.
     $rowsToImport = T\ValueTransforms::valueMapper($rowsToImport, 'payment_instrument_id:label', ['' => 'Unknown']);
     // Create any missing payment methods in the OptionValues table.
