@@ -97,14 +97,14 @@ class Contributions {
     $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
       return isset($row['contact_sub_type']) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
     });
-    // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
-    $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
     if ($rowsWithThirdParty) {
       $rowsWithThirdParty = T\Columns::deleteAllColumnsExcept($rowsWithThirdParty, ['Legacy_Contribution_Data.LGL_Gift_ID']);
       $rowsWithThirdParty = T\Columns::renameColumns($rowsWithThirdParty, ['Legacy_Contribution_Data.LGL_Gift_ID' => 'LGL_Gift_ID']);
       $thirdPartyWriter = new \Civietl\Writer\CsvWriter(['file_path' => $GLOBALS['workroot'] . '/data/gifts_not_imported.csv']);
       $thirdPartyWriter->writeAll($rowsWithThirdParty);
     }
+    // The remaining rows with a Vehicle will be imported and treated as DAF Contributions.
+    $rowsWithDAF = array_diff_key($rowsWithVehicle, $rowsWithThirdParty);
     // Assign a Donor Advisor for DAF Contributions if the Contact is an Individual or a Donor Advised Fund if the Contact is an Organization.
     if ($rowsWithDAF) {
       $rowsWithDAF = T\Columns::newColumnWithConstant($rowsWithDAF, 'Donor_Advised_Fund.Donor_Advisor', '');
