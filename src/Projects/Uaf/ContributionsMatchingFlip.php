@@ -22,34 +22,24 @@ class ContributionsMatchingFlip {
     $rows = T\Columns::renameColumns($rows, [
       'Gift Amount' => 'amount',
       'Vehicle Name' => 'vehicle_name',
+      'LGL Gift ID' => 'LGL_Gift_ID',
+      'LGL Parent Gift ID' => 'LGL_Parent_Gift_ID',
     ]);
-    // Load a list of gift IDs we're not importing, and rekey to the LGL Gift ID.
-    $giftsNotImportedReader = new \Civietl\Reader\CsvReader([
-      'file_path' => $GLOBALS['workroot'] . '/data/gifts_not_imported.csv',
-      'data_primary_key' => 'LGL Gift ID',
-    ]);
-    $giftsNotImported = $giftsNotImportedReader->getRows();
-    $giftsNotImported = array_combine(array_column($giftsNotImported, 'LGL_Gift_ID'), $giftsNotImported);
-    // Rekey the actual rows to the *parent's* LGL Gift ID.
-    $rows = array_combine(array_column($rows, 'LGL Parent Gift ID'), $rows);
-    // Remove contributions not imported from $rows.
-    $rows = array_diff_key($rows, $giftsNotImported);
-    // Look up and return the external_identifier of the Vehicle.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', ['vehicle_name' => 'organization_name'], ['external_identifier']);
-    $rows = T\Columns::renameColumns($rows, ['external_identifier' => 'vehicle_external_identifier']);
-    // Filter out Contributions with Vehicles since they are all Third Party Giving Contributions. Split rows into those with a Vehicle and those without.
-    $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_external_identifier');
-    $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
-    // Only import those without a Vehicle (Third Party Giving Contribution).
-    if ($rowsWithVehicle) {
-      $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['contact_sub_type']);
+
+    // Look up the LGL Parent Gift ID. If it exsists in CiviCRM, perform the flip.
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL_Parent_Gift_ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
+    $rowsWithExistingParent = T\RowFilters::filterBlanks($rows, 'id');
+    $rowsToNotImport = array_diff_key($rows, $rowsWithExistingParent);
+    // If there are rows that will not be flipped because the parent contribution is not imported, write these to a CSV file.
+    if ($rowsToNotImport) {
+      $rowsToNotImport = T\Columns::deleteAllColumnsExcept($rowsToNotImport, ['LGL_Gift_ID', 'LGL_Parent_Gift_ID']);
+      $noParentWriter = new \Civietl\Writer\CsvWriter(['file_path' => $GLOBALS['workroot'] . '/data/matching_gifts_flip_without_parent_not_imported.csv']);
+      $noParentWriter->writeAll($rowsToNotImport);
     }
-    // // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
-    $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
-      return isset($row['contact_sub_type'][0]) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
-    });
-    $rowsWithoutThirdParty = array_diff_key($rows, $rowsWithThirdParty);
-    $rows = $rowsWithNoVehicle + $rowsWithoutThirdParty;
+    // Remove the id field, since we are creating new Contributions.
+    $rowsWithExistingParent = T\Columns::deleteColumns($rowsWithExistingParent, ['id']);
+    // Continue the transformations with rows that have an existing parent contribution.
+    $rows = $rowsWithExistingParent;
 
     // Look up and return the id of the Contact this Contribution is connected to.
     $rows = T\CiviCRM::lookup($rows, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['id']);
@@ -60,6 +50,11 @@ class ContributionsMatchingFlip {
     $rowsWithIndividual = array_filter($rows, function($row) {
       return isset($row['contact_type']) && $row['contact_type'] === 'Individual';
     });
+    if ($rowsWithIndividual) {
+      $rowsWithIndividual = T\Columns::deleteAllColumnsExcept($rowsWithIndividual, ['LGL_Gift_ID']);
+      $individualWriter = new \Civietl\Writer\CsvWriter(['file_path' => $GLOBALS['workroot'] . '/data/individual_matching_gifts_flip_not_imported.csv']);
+      $individualWriter->writeAll($rowsWithIndividual);
+    }
     $rowsWithOrganization = array_diff_key($rows, $rowsWithIndividual);
     $rows = $rowsWithOrganization;
 
@@ -67,8 +62,8 @@ class ContributionsMatchingFlip {
     $rows = T\Columns::renameColumns($rows, ['contact_id' => 'gift_details.matching_gift']);
 
     // Connect the matching Contribution, to apply the Soft Credit.
-    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['contact_id']);
-    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL_Parent_Gift_ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['contact_id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL_Gift_ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contribution_id']);
     $rows = T\Columns::deleteAllColumnsExcept($rows, ['contribution_id', 'contact_id', 'amount']);
     return $rows;
