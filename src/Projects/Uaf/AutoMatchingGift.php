@@ -18,19 +18,24 @@ class AutoMatchingGift {
     ]);
     // Rename the columns that will be imported to match CiviCRM fields.
     $rows = T\Columns::renameColumns($rows, [
-      'LGL Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID',
+      'LGL Gift ID' => 'LGL_Gift_ID',
+      'LGL Parent Gift ID' => 'LGL_Parent_Gift_ID',
     ]);
-    // Load a list of gift IDs we're not importing, and rekey to the LGL Gift ID.
-    $giftsNotImportedReader = new \Civietl\Reader\CsvReader([
-      'file_path' => $GLOBALS['workroot'] . '/data/gifts_not_imported.csv',
-      'data_primary_key' => 'LGL Gift ID',
-    ]);
-    $giftsNotImported = $giftsNotImportedReader->getRows();
-    $giftsNotImported = array_combine(array_column($giftsNotImported, 'LGL_Gift_ID'), $giftsNotImported);
-    // Rekey the actual rows to the *parent's* LGL Gift ID.
-    $rows = array_combine(array_column($rows, 'LGL Parent Gift ID'), $rows);
-    // Remove contributions not imported from $rows.
-    $rows = array_diff_key($rows, $giftsNotImported);
+
+    // Look up the LGL Parent Gift ID. If it exsists in CiviCRM, perform the flip.
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL_Parent_Gift_ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
+    $rowsWithExistingParent = T\RowFilters::filterBlanks($rows, 'id');
+    $rowsToNotImport = array_diff_key($rows, $rowsWithExistingParent);
+    // If there are rows that will not be flipped because the parent contribution is not imported, write these to a CSV file.
+    if ($rowsToNotImport) {
+      $rowsToNotImport = T\Columns::deleteAllColumnsExcept($rowsToNotImport, ['LGL_Gift_ID', 'LGL_Parent_Gift_ID']);
+      $noParentWriter = new \Civietl\Writer\CsvWriter(['file_path' => $GLOBALS['workroot'] . '/data/auto_matching_gifts_without_parent_not_imported.csv']);
+      $noParentWriter->writeAll($rowsToNotImport);
+    }
+    // Remove the id field, since we are creating new Contributions.
+    $rowsWithExistingParent = T\Columns::deleteColumns($rowsWithExistingParent, ['id']);
+    // Continue the transformations with rows that have an existing parent contribution.
+    $rows = $rowsWithExistingParent;
 
     // Look up the Contact Type of the above Contact
     $rows = T\CiviCRM::lookup($rows, 'Contact', ['LGL Constituent ID' => 'external_identifier'], ['contact_type', 'id']);
@@ -38,22 +43,17 @@ class AutoMatchingGift {
     $rowsWithIndividual = array_filter($rows, function($row) {
       return isset($row['contact_type']) && $row['contact_type'] === 'Individual';
     });
+    if ($rowsWithIndividual) {
+      $rowsWithIndividual = T\Columns::deleteAllColumnsExcept($rowsWithIndividual, ['LGL_Gift_ID', 'LGL_Parent_Gift_ID']);
+      $individualWriter = new \Civietl\Writer\CsvWriter(['file_path' => $GLOBALS['workroot'] . '/data/individual_auto_matching_gifts_not_imported.csv']);
+      $individualWriter->writeAll($rowsWithIndividual);
+    }
     $rowsWithOrganization = array_diff_key($rows, $rowsWithIndividual);
     $rows = $rowsWithOrganization;
 
-    // Filter out Contributions with Vehciles since they are all Third Party Giving Contributions.
-    // Split rows into those with a Vehicle and those without.
-    $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'Vehicle Name');
-    $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
-    // Only import those without a Vehicle (Third Party Giving Contribution).
-    if ($rowsWithVehicle) {
-      $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['id' => 'id'], ['contact_sub_type']);
-    }
-    $rows = $rowsWithNoVehicle;
-
     // Connect the matching Contribution, to assign the Contact of this Contribution as the Matching Gift Organization
     $rows = T\Columns::renameColumns($rows, ['id' => 'gift_details.matching_gift']);
-    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL Parent Gift ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
+    $rows = T\CiviCRM::lookup($rows, 'Contribution', ['LGL_Parent_Gift_ID' => 'Legacy_Contribution_Data.LGL_Gift_ID'], ['id']);
     $rows = T\Columns::deleteAllColumnsExcept($rows, ['gift_details.matching_gift', 'id']);
 
     return $rows;
