@@ -13,7 +13,6 @@ class ContributionsMatching {
     $rows = T\Columns::deleteAllColumnsExcept($rows, [
       'LGL Constituent ID',
       'LGL Gift ID',
-      'LGL Parent Gift ID',
       'Gift Type',
       'LGL Campaign ID',
       'Fund',
@@ -62,29 +61,13 @@ class ContributionsMatching {
     });
 
     // Contacts
-    // Look up and return the external_identifier of the Vehicle.
-    $rows = T\CiviCRM::lookup($rows, 'Contact', ['vehicle_name' => 'organization_name'], ['external_identifier']);
-    $rows = T\Columns::renameColumns($rows, ['external_identifier' => 'vehicle_external_identifier']);
-    // If the Contribution has a Vehicle, use that, if not, use the LGL Constituent ID.
-    $rows = T\Columns::coalesceColumns($rows, ['vehicle_external_identifier', 'contact_external_identifier'], 'constituent_or_vehicle');
     // Look up and return the id of the Contact this Contribution is connected to.
     $rows = T\CiviCRM::lookup($rows, 'Contact', ['contact_external_identifier' => 'external_identifier'], ['id']);
     $rows = T\Columns::renameColumns($rows, ['id' => 'contact_id']);
-
-    // Filter out Third Party Giving Contributions.
-    // Split rows into those with a Vehicle and those without.
-    $rowsWithVehicle = T\RowFilters::filterBlanks($rows, 'vehicle_name');
-    $rowsWithNoVehicle = array_diff_key($rows, $rowsWithVehicle);
-    // Look up the Contact Subtype of rows with a Vehicle.
-    if ($rowsWithVehicle) {
-      $rowsWithVehicle = T\CiviCRM::lookup($rowsWithVehicle, 'Contact', ['contact_id' => 'id'], ['contact_sub_type']);
-    }
-    // Separate the rows in which the Contact is a Third Part Giving Vehicle. These Contributions will not be imported by the civietl.
-    $rowsWithThirdParty = array_filter($rowsWithVehicle, function($row) {
-      return isset($row['contact_sub_type'][0]) && $row['contact_sub_type'][0] === 'Third Party Giving Vehicle';
-    });
-    $rowsWithoutThirdParty = array_diff_key($rows, $rowsWithThirdParty);
-    $rows = $rowsWithNoVehicle + $rowsWithoutThirdParty;
+    // Look up and return the id of the Vehicle. In the gifts_matching_gifts.csv, all Vehicles are Third Parties.
+    $rows = T\CiviCRM::lookup($rows, 'Contact', ['vehicle_name' => 'organization_name'], ['id']);
+    // Assign the Vehicle to the Third Party Giving Vehicle custom field.
+    $rows = T\Columns::renameColumns($rows, ['id' => 'Additional_Contribution_Data.Third_Party_Giving_Vehicle']);
 
     // Campaigns
     // Remap 0 to an empty string for the camapaign and/or appeal external ids.
