@@ -269,6 +269,17 @@ $importSettings = [
     ],
     // 'writer_type' => 'CsvWriter',
   ],
+  'MatchingGiftOrganizations' => [
+    'readerOptions' => [
+      'file_path' => "$workroot/raw data/full_archive/gift_matching_gifts.csv",
+      'data_primary_key' => 'LGL Constituent ID',
+    ],
+    'writerOptions' => [
+      'civi_primary_entity' => 'GroupContact',
+      'file_path' => "$workroot/data/tempAutoMatchOrgs.csv",
+      'match_fields' => ['contact_id'],
+    ],
+  ],
   'ContributionsInKind' => [
     'readerOptions' => [
       'file_path' => "$workroot/raw data/full_archive/gift_in_kind.csv",
